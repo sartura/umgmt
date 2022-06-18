@@ -65,7 +65,7 @@ int um_user_db_delete_user(um_user_db_t *db, const char *user_name);
  * @return Users list head.
  *
  */
-um_user_element_t *um_user_db_get_user_list_head(const um_user_db_t *db);
+const um_user_element_t *um_user_db_get_user_list_head(const um_user_db_t *db);
 
 /**
  * Free user database data.
