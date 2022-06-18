@@ -11,8 +11,22 @@
 typedef struct um_user_s um_user_t;
 
 /**
+ * User list element.
+ */
+typedef struct um_user_element_s um_user_element_t;
+
+/**
  * Abstract user database type.
  */
 typedef struct um_user_db_s um_user_db_t;
+
+/**
+ * User list element.
+ */
+struct um_user_element_s
+{
+    um_user_t *user;         ///< Allocated abstract user data type.
+    um_user_element_t *next; ///< Link to the next list node.
+};
 
 #endif // UMGMT_TYPES_H

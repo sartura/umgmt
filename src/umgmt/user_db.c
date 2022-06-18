@@ -10,14 +10,6 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-typedef struct um_user_element_s um_user_element_t;
-
-struct um_user_element_s
-{
-    um_user_t *user;
-    um_user_element_t *next;
-};
-
 struct um_user_db_s
 {
     um_user_element_t *users_head;
