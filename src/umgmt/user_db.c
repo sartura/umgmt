@@ -145,6 +145,7 @@ int um_user_db_load(um_user_db_t *db)
         }
     }
 
+    shadow_closed = true;
     endspent();
 
 error_out:
