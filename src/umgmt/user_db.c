@@ -140,6 +140,8 @@ int um_user_db_load(um_user_db_t *db)
     shadow_closed = true;
     endspent();
 
+    goto out;
+
 error_out:
     error = -1;
     if (tmp_user && !user_set)
