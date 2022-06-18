@@ -167,6 +167,92 @@ out:
 }
 
 /**
+ * Store user database to the system.
+ *
+ * @param db Database to store.
+ *
+ * @return Error code - 0 on success.
+ *
+ */
+int um_user_db_store(um_user_db_t *db)
+{
+    int error = 0;
+    FILE *passwd_file = NULL;
+    FILE *shadow_file = NULL;
+
+    um_user_element_t *user_iter = NULL;
+
+    passwd_file = fopen("/etc/passwd", "w");
+    if (!passwd_file)
+    {
+        goto error_out;
+    }
+
+    shadow_file = fopen("/etc/shadow", "w");
+    if (!passwd_file)
+    {
+        goto error_out;
+    }
+
+    LL_FOREACH(db->users_head, user_iter)
+    {
+        const um_user_t *user = user_iter->user;
+
+        // setup passwd data
+        const struct passwd tmp_passwd = (const struct passwd){
+            .pw_name = (char *)um_user_get_name(user),
+            .pw_passwd = (char *)um_user_get_password(user),
+            .pw_dir = (char *)um_user_get_home_path(user),
+            .pw_gecos = (char *)um_user_get_gecos(user),
+            .pw_shell = (char *)um_user_get_shell_path(user),
+            .pw_uid = um_user_get_uid(user),
+            .pw_gid = um_user_get_gid(user),
+        };
+
+        // setup shadow data
+        const struct spwd tmp_spwd = (const struct spwd){
+            .sp_namp = (char *)um_user_get_name(user),
+            .sp_pwdp = (char *)um_user_get_password_hash(user),
+            .sp_lstchg = um_user_get_last_change(user),
+            .sp_min = um_user_get_change_min(user),
+            .sp_max = um_user_get_change_max(user),
+            .sp_expire = um_user_get_expiration(user),
+            .sp_flag = um_user_get_flags(user),
+            .sp_inact = um_user_get_inactive_days(user),
+            .sp_warn = um_user_get_warn_days(user),
+        };
+
+        // passwd
+        if (putpwent(&tmp_passwd, passwd_file))
+        {
+            goto error_out;
+        }
+
+        // shadow
+        if (putspent(&tmp_spwd, shadow_file))
+        {
+            goto error_out;
+        }
+    }
+
+error_out:
+    error = -1;
+
+out:
+    if (passwd_file)
+    {
+        fclose(passwd_file);
+    }
+
+    if (shadow_file)
+    {
+        fclose(shadow_file);
+    }
+
+    return error;
+}
+
+/**
  * Get the user from the database.
  *
  * @param db Database to use.
@@ -254,89 +340,16 @@ out:
 }
 
 /**
- * Store user database to the system.
+ * Get users list head.
  *
- * @param db Database to store.
+ * @param db Database to use.
  *
- * @return Error code - 0 on success.
+ * @return Users list head.
  *
  */
-int um_user_db_store(um_user_db_t *db)
+um_user_element_t *um_user_db_get_user_list_head(const um_user_db_t *db)
 {
-    int error = 0;
-    FILE *passwd_file = NULL;
-    FILE *shadow_file = NULL;
-
-    um_user_element_t *user_iter = NULL;
-
-    passwd_file = fopen("/etc/passwd", "w");
-    if (!passwd_file)
-    {
-        goto error_out;
-    }
-
-    shadow_file = fopen("/etc/shadow", "w");
-    if (!passwd_file)
-    {
-        goto error_out;
-    }
-
-    LL_FOREACH(db->users_head, user_iter)
-    {
-        const um_user_t *user = user_iter->user;
-
-        // setup passwd data
-        const struct passwd tmp_passwd = (const struct passwd){
-            .pw_name = (char *)um_user_get_name(user),
-            .pw_passwd = (char *)um_user_get_password(user),
-            .pw_dir = (char *)um_user_get_home_path(user),
-            .pw_gecos = (char *)um_user_get_gecos(user),
-            .pw_shell = (char *)um_user_get_shell_path(user),
-            .pw_uid = um_user_get_uid(user),
-            .pw_gid = um_user_get_gid(user),
-        };
-
-        // setup shadow data
-        const struct spwd tmp_spwd = (const struct spwd){
-            .sp_namp = (char *)um_user_get_name(user),
-            .sp_pwdp = (char *)um_user_get_password_hash(user),
-            .sp_lstchg = um_user_get_last_change(user),
-            .sp_min = um_user_get_change_min(user),
-            .sp_max = um_user_get_change_max(user),
-            .sp_expire = um_user_get_expiration(user),
-            .sp_flag = um_user_get_flags(user),
-            .sp_inact = um_user_get_inactive_days(user),
-            .sp_warn = um_user_get_warn_days(user),
-        };
-
-        // passwd
-        if (putpwent(&tmp_passwd, passwd_file))
-        {
-            goto error_out;
-        }
-
-        // shadow
-        if (putspent(&tmp_spwd, shadow_file))
-        {
-            goto error_out;
-        }
-    }
-
-error_out:
-    error = -1;
-
-out:
-    if (passwd_file)
-    {
-        fclose(passwd_file);
-    }
-
-    if (shadow_file)
-    {
-        fclose(shadow_file);
-    }
-
-    return error;
+    return db->users_head;
 }
 
 /**

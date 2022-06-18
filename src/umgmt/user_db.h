@@ -26,6 +26,16 @@ um_user_db_t *um_user_db_new();
 int um_user_db_load(um_user_db_t *db);
 
 /**
+ * Store user database to the system.
+ *
+ * @param db Database to store.
+ *
+ * @return Error code - 0 on success.
+ *
+ */
+int um_user_db_store(um_user_db_t *db);
+
+/**
  * Get the user from the database.
  *
  * @param db Database to use.
@@ -48,14 +58,14 @@ um_user_t *um_user_db_get_user(um_user_db_t *db, const char *user_name);
 int um_user_db_delete_user(um_user_db_t *db, const char *user_name);
 
 /**
- * Store user database to the system.
+ * Get users list head.
  *
- * @param db Database to store.
+ * @param db Database to use.
  *
- * @return Error code - 0 on success.
+ * @return Users list head.
  *
  */
-int um_user_db_store(um_user_db_t *db);
+um_user_element_t *um_user_db_get_user_list_head(const um_user_db_t *db);
 
 /**
  * Free user database data.
