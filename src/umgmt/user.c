@@ -36,7 +36,7 @@ struct um_user_s
  *
  * @return New allocated user.
  */
-um_user_t *um_user_new()
+um_user_t *um_user_new(void)
 {
     um_user_t *new_user = (um_user_t *)malloc(sizeof(um_user_t));
 

@@ -13,7 +13,7 @@
  * @return New allocated database.
  *
  */
-um_user_db_t *um_user_db_new();
+um_user_db_t *um_user_db_new(void);
 
 /**
  * Load user database from the system.

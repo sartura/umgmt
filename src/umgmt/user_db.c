@@ -23,7 +23,7 @@ static int um_user_element_cmp_fn(void *d1, void *d2);
  * @return New allocated database.
  *
  */
-um_user_db_t *um_user_db_new()
+um_user_db_t *um_user_db_new(void)
 {
     um_user_db_t *new_db = (um_user_db_t *)malloc(sizeof(um_user_db_t));
 

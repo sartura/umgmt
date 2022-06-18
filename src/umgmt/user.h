@@ -15,7 +15,7 @@
  *
  * @return New allocated user.
  */
-um_user_t *um_user_new();
+um_user_t *um_user_new(void);
 
 /**
  * Set the name for the user.
