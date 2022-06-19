@@ -370,6 +370,8 @@ void um_user_db_free(um_user_db_t *db)
         LL_DELETE(db->users_head, user_iter);
         free(user_iter);
     }
+
+    free(db);
 }
 
 static int um_user_element_cmp_fn(void *d1, void *d2)
