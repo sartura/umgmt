@@ -58,6 +58,18 @@ uid_t um_user_db_get_new_uid(um_user_db_t *db);
 gid_t um_user_db_get_new_gid(um_user_db_t *db);
 
 /**
+ * Add a new user to the database.
+ * User will be handled by the database from this point on - do not free user data after adding user to the database.
+ *
+ * @param db Database to use.
+ * @param user_name User to search for.
+ *
+ * @return Abstract user type - NULL if not found.
+ *
+ */
+int um_user_db_add_user(um_user_db_t *db, um_user_t *user);
+
+/**
  * Get the user from the database.
  *
  * @param db Database to use.
