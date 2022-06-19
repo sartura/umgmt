@@ -7,6 +7,8 @@
 
 #include "types.h"
 
+#include <pwd.h>
+
 /**
  * Allocate new user database.
  *
@@ -34,6 +36,26 @@ int um_user_db_load(um_user_db_t *db);
  *
  */
 int um_user_db_store(um_user_db_t *db);
+
+/**
+ * Return the new UID which can be used for a new user.
+ *
+ * @param db Database to use.
+ *
+ * @return New UID.
+ *
+ */
+uid_t um_user_db_get_new_uid(um_user_db_t *db);
+
+/**
+ * Return the new GID which can be used for a new user.
+ *
+ * @param db Database to use.
+ *
+ * @return New GID.
+ *
+ */
+gid_t um_user_db_get_new_gid(um_user_db_t *db);
 
 /**
  * Get the user from the database.

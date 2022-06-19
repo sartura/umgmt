@@ -255,6 +255,54 @@ out:
 }
 
 /**
+ * Return the new UID which can be used for a new user.
+ *
+ * @param db Database to use.
+ *
+ * @return New UID.
+ *
+ */
+uid_t um_user_db_get_new_uid(um_user_db_t *db)
+{
+    um_user_element_t *user_iter = NULL;
+    gid_t max_uid = 0;
+
+    LL_FOREACH(db->users_head, user_iter)
+    {
+        if (um_user_get_uid(user_iter->user) >= 1000 && um_user_get_uid(user_iter->user) > max_uid)
+        {
+            max_uid = um_user_get_uid(user_iter->user);
+        }
+    }
+
+    return max_uid;
+}
+
+/**
+ * Return the new GID which can be used for a new user.
+ *
+ * @param db Database to use.
+ *
+ * @return New GID.
+ *
+ */
+gid_t um_user_db_get_new_gid(um_user_db_t *db)
+{
+    um_user_element_t *user_iter = NULL;
+    gid_t max_gid = 0;
+
+    LL_FOREACH(db->users_head, user_iter)
+    {
+        if (um_user_get_uid(user_iter->user) >= 1000 && um_user_get_gid(user_iter->user) > max_gid)
+        {
+            max_gid = um_user_get_gid(user_iter->user);
+        }
+    }
+
+    return max_gid;
+}
+
+/**
  * Get the user from the database.
  *
  * @param db Database to use.
