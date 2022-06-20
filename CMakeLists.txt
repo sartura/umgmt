@@ -12,7 +12,8 @@ set(
     UMGMT_SOURCES
 
     "src/umgmt/user.c"
-    "src/umgmt/user_db.c"
+    "src/umgmt/group.c"
+    "src/umgmt/db.c"
 )
 
 add_library(
@@ -33,8 +34,9 @@ install(
 install(
     FILES
     ${PROJECT_SOURCE_DIR}/src/umgmt/types.h
-    ${PROJECT_SOURCE_DIR}/src/umgmt/user_db.h
+    ${PROJECT_SOURCE_DIR}/src/umgmt/db.h
     ${PROJECT_SOURCE_DIR}/src/umgmt/user.h
+    ${PROJECT_SOURCE_DIR}/src/umgmt/group.h
 
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/umgmt
 )

@@ -7,6 +7,7 @@
 
 #include "umgmt/types.h"
 #include "umgmt/user.h"
-#include "umgmt/user_db.h"
+#include "umgmt/group.h"
+#include "umgmt/db.h"
 
 #endif // UMGMT_H
