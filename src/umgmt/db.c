@@ -2,15 +2,12 @@
 #include "user.h"
 #include "group.h"
 
+#include <gshadow.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <utlist.h>
 #include <stdbool.h>
-#include <pwd.h>
-#include <shadow.h>
-#include <grp.h>
-#include <gshadow.h>
 
 struct um_db_s
 {
@@ -328,8 +325,20 @@ int um_db_store(um_db_t *db)
     int error = 0;
     FILE *passwd_file = NULL;
     FILE *shadow_file = NULL;
+    FILE *gpasswd_file = NULL;
+    FILE *gshadow_file = NULL;
 
     um_user_element_t *user_iter = NULL;
+    um_group_element_t *group_iter = NULL;
+    const um_group_user_element_t *tmp_group_user = NULL;
+
+    const char **members = NULL;
+    const char **admins = NULL;
+    bool members_allocated = false;
+    bool admins_allocated = false;
+
+    int members_count = 0;
+    int admins_count = 0;
 
     passwd_file = fopen("/etc/passwd", "w");
     if (!passwd_file)
@@ -339,6 +348,18 @@ int um_db_store(um_db_t *db)
 
     shadow_file = fopen("/etc/shadow", "w");
     if (!passwd_file)
+    {
+        goto error_out;
+    }
+
+    gpasswd_file = fopen("/etc/group", "w");
+    if (!gpasswd_file)
+    {
+        goto error_out;
+    }
+
+    gshadow_file = fopen("/etc/gshadow", "w");
+    if (!gpasswd_file)
     {
         goto error_out;
     }
@@ -384,12 +405,101 @@ int um_db_store(um_db_t *db)
         }
     }
 
+    LL_FOREACH(db->group_head, group_iter)
+    {
+        const um_group_t *group = group_iter->group;
+
+        // get admins and members count
+        LL_COUNT(um_group_get_members_head(group), tmp_group_user, members_count);
+        LL_COUNT(um_group_get_admin_head(group), tmp_group_user, admins_count);
+
+        // allocate string[] for members and admins
+        members_allocated = false;
+        admins_allocated = false;
+
+        members = malloc(sizeof(const char *) * (members_count + 1));
+        if (!members)
+        {
+            goto error_out;
+        }
+        members_allocated = true;
+
+        admins = malloc(sizeof(const char *) * (admins_count + 1));
+        if (!admins)
+        {
+            goto error_out;
+        }
+        admins_allocated = true;
+
+        // setup members and admins
+        int i = 0;
+
+        LL_FOREACH(um_group_get_members_head(group), tmp_group_user)
+        {
+            members[i] = um_user_get_name(tmp_group_user->user);
+            ++i;
+        }
+
+        // end list
+        members[i] = 0;
+
+        i = 0;
+        LL_FOREACH(um_group_get_admin_head(group), tmp_group_user)
+        {
+            admins[i] = um_user_get_name(tmp_group_user->user);
+            ++i;
+        }
+
+        // end list
+        admins[i] = 0;
+
+        const struct group tmp_group = (const struct group){
+            .gr_name = (char *)um_group_get_name(group),
+            .gr_passwd = (char *)um_group_get_password(group),
+            .gr_gid = um_group_get_gid(group),
+            .gr_mem = (char **)members,
+        };
+
+        const struct sgrp tmp_sgrp = (const struct sgrp){
+            .sg_namp = (char *)um_group_get_name(group),
+            .sg_passwd = (char *)um_group_get_password_hash(group),
+            .sg_adm = (char **)admins,
+            .sg_mem = (char **)members,
+        };
+
+        if (putgrent(&tmp_group, gpasswd_file))
+        {
+            goto error_out;
+        }
+
+        if (putsgent(&tmp_sgrp, gshadow_file))
+        {
+            goto error_out;
+        }
+
+        // free members and admins string[]
+        free(members);
+        free(admins);
+        members_allocated = false;
+        admins_allocated = false;
+    }
+
     goto out;
 
 error_out:
     error = -1;
 
 out:
+    if (members && members_allocated)
+    {
+        free(members);
+    }
+
+    if (admins && admins_allocated)
+    {
+        free(admins);
+    }
+
     if (passwd_file)
     {
         fclose(passwd_file);
@@ -398,6 +508,16 @@ out:
     if (shadow_file)
     {
         fclose(shadow_file);
+    }
+
+    if (gpasswd_file)
+    {
+        fclose(gpasswd_file);
+    }
+
+    if (gshadow_file)
+    {
+        fclose(gshadow_file);
     }
 
     return error;

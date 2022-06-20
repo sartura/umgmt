@@ -7,6 +7,7 @@
 
 #include "types.h"
 
+#define __USE_GNU
 #include <grp.h>
 #include <gshadow.h>
 
