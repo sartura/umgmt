@@ -243,6 +243,8 @@ int um_user_db_store(um_user_db_t *db)
         }
     }
 
+    goto out;
+
 error_out:
     error = -1;
 
