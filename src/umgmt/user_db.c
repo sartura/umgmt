@@ -284,7 +284,7 @@ uid_t um_user_db_get_new_uid(um_user_db_t *db)
         }
     }
 
-    return max_uid;
+    return max_uid + 1;
 }
 
 /**
@@ -309,7 +309,7 @@ gid_t um_user_db_get_new_gid(um_user_db_t *db)
         }
     }
 
-    return max_gid;
+    return max_gid + 1;
 }
 
 /**
