@@ -279,7 +279,7 @@ const um_group_user_element_t *um_group_get_admin_head(const um_group_t *group)
  */
 void um_group_free(um_group_t *group)
 {
-    um_group_user_element_t *iter = NULL;
+    um_group_user_element_t *iter = NULL, *tmp = NULL;
 
     if (group->name)
     {
@@ -296,13 +296,13 @@ void um_group_free(um_group_t *group)
         free(group->gshadow.password_hash);
     }
 
-    LL_FOREACH(group->gshadow.members_head, iter)
+    LL_FOREACH_SAFE(group->gshadow.members_head, iter, tmp)
     {
         LL_DELETE(group->gshadow.members_head, iter);
         free(iter);
     }
 
-    LL_FOREACH(group->gshadow.admin_head, iter)
+    LL_FOREACH_SAFE(group->gshadow.admin_head, iter, tmp)
     {
         LL_DELETE(group->gshadow.admin_head, iter);
         free(iter);

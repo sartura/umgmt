@@ -76,6 +76,12 @@ int um_db_load(um_db_t *db)
         goto error_out;
     }
 
+    group_search_element.group = um_group_new();
+    if (!group_search_element.group)
+    {
+        goto error_out;
+    }
+
     // load /etc/passwd data and after that load /etc/shadow data
     setpwent();
 
@@ -131,6 +137,7 @@ int um_db_load(um_db_t *db)
             goto error_out;
         }
 
+        user_found_element = NULL;
         LL_SEARCH(db->user_head, user_found_element, &user_search_element, um_user_element_cmp_fn);
 
         // set shadow data
@@ -201,6 +208,7 @@ int um_db_load(um_db_t *db)
             goto error_out;
         }
 
+        group_found_element = NULL;
         LL_SEARCH(db->group_head, group_found_element, &group_search_element, um_group_element_cmp_fn);
 
         // set shadow data
@@ -208,17 +216,16 @@ int um_db_load(um_db_t *db)
         {
             um_group_t *group = group_found_element->group;
 
-            if (um_group_set_password_hash(group, spwd->sp_pwdp))
+            if (um_group_set_password_hash(group, sgrp->sg_passwd))
                 goto error_out;
 
             // add admin and member lists
-            char *member_iter = *sgrp->sg_mem;
-            char *admin_iter = *sgrp->sg_adm;
 
-            // members
-            while (member_iter)
+            for (int i = 0; sgrp->sg_mem[i] != NULL; i++)
             {
-                error = um_user_set_name(user_search_element.user, member_iter);
+                const char *member = sgrp->sg_mem[i];
+
+                error = um_user_set_name(user_search_element.user, member);
                 if (error)
                 {
                     goto error_out;
@@ -234,19 +241,19 @@ int um_db_load(um_db_t *db)
                         goto error_out;
                     }
                 }
-
-                ++member_iter;
             }
 
-            // admins
-            while (admin_iter)
+            for (int i = 0; sgrp->sg_adm[i] != NULL; i++)
             {
-                error = um_user_set_name(user_search_element.user, member_iter);
+                const char *admin = sgrp->sg_adm[i];
+
+                error = um_user_set_name(user_search_element.user, admin);
                 if (error)
                 {
                     goto error_out;
                 }
 
+                user_found_element = NULL;
                 LL_SEARCH(db->user_head, user_found_element, &user_search_element, um_user_element_cmp_fn);
 
                 if (user_found_element)
@@ -257,8 +264,6 @@ int um_db_load(um_db_t *db)
                         goto error_out;
                     }
                 }
-
-                ++admin_iter;
             }
         }
     }
@@ -874,5 +879,5 @@ static int um_group_element_cmp_fn(void *d1, void *d2)
     um_group_element_t *g1 = d1;
     um_group_element_t *g2 = d2;
 
-    return strcmp(um_group_get_name(g1->group), um_group_get_name(g1->group));
+    return strcmp(um_group_get_name(g1->group), um_group_get_name(g2->group));
 }
