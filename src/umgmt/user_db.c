@@ -117,6 +117,12 @@ int um_user_db_load(um_user_db_t *db)
     while ((spwd = getspent()) != NULL)
     {
         // get user from the list
+        error = um_user_set_name(search_element.user, spwd->sp_namp);
+        if (error)
+        {
+            goto error_out;
+        }
+
         LL_SEARCH(db->users_head, found_element, &search_element, um_user_element_cmp_fn);
 
         // set shadow data
@@ -269,7 +275,8 @@ uid_t um_user_db_get_new_uid(um_user_db_t *db)
 
     LL_FOREACH(db->users_head, user_iter)
     {
-        if (um_user_get_uid(user_iter->user) >= 1000 && um_user_get_uid(user_iter->user) > max_uid)
+        if (um_user_get_uid(user_iter->user) >= 1000 && um_user_get_uid(user_iter->user) < 65534 &&
+            um_user_get_uid(user_iter->user) > max_uid)
         {
             max_uid = um_user_get_uid(user_iter->user);
         }
@@ -293,7 +300,8 @@ gid_t um_user_db_get_new_gid(um_user_db_t *db)
 
     LL_FOREACH(db->users_head, user_iter)
     {
-        if (um_user_get_uid(user_iter->user) >= 1000 && um_user_get_gid(user_iter->user) > max_gid)
+        if (um_user_get_uid(user_iter->user) >= 1000 && um_user_get_uid(user_iter->user) < 65534 &&
+            um_user_get_gid(user_iter->user) > max_gid)
         {
             max_gid = um_user_get_gid(user_iter->user);
         }
