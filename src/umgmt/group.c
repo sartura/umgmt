@@ -52,14 +52,14 @@ um_group_t *um_group_new(void)
  */
 int um_group_set_name(um_group_t *group, const char *name)
 {
+    if (group->name)
+    {
+        free(group->name);
+        group->name = 0;
+    }
+
     if (name)
     {
-        if (group->name)
-        {
-            free(group->name);
-            group->name = 0;
-        }
-
         group->name = strdup(name);
         if (!group->name)
         {
@@ -81,14 +81,14 @@ int um_group_set_name(um_group_t *group, const char *name)
  */
 int um_group_set_password(um_group_t *group, const char *password)
 {
+    if (group->password)
+    {
+        free(group->password);
+        group->password = 0;
+    }
+
     if (password)
     {
-        if (group->password)
-        {
-            free(group->password);
-            group->password = 0;
-        }
-
         group->password = strdup(password);
         if (!group->password)
         {
@@ -122,14 +122,14 @@ void um_group_set_gid(um_group_t *group, gid_t gid)
  */
 int um_group_set_password_hash(um_group_t *group, const char *password_hash)
 {
+    if (group->gshadow.password_hash)
+    {
+        free(group->gshadow.password_hash);
+        group->gshadow.password_hash = 0;
+    }
+
     if (password_hash)
     {
-        if (group->gshadow.password_hash)
-        {
-            free(group->gshadow.password_hash);
-            group->gshadow.password_hash = 0;
-        }
-
         group->gshadow.password_hash = strdup(password_hash);
         if (!group->gshadow.password_hash)
         {
