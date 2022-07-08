@@ -62,14 +62,14 @@ um_user_t *um_user_new(void)
  */
 int um_user_set_name(um_user_t *user, const char *name)
 {
+    if (user->name)
+    {
+        free(user->name);
+        user->name = 0;
+    }
+
     if (name)
     {
-        if (user->name)
-        {
-            free(user->name);
-            user->name = 0;
-        }
-
         user->name = strdup(name);
         if (!user->name)
         {
@@ -91,14 +91,14 @@ int um_user_set_name(um_user_t *user, const char *name)
  */
 int um_user_set_password(um_user_t *user, const char *password)
 {
+    if (user->password)
+    {
+        free(user->password);
+        user->password = 0;
+    }
+
     if (password)
     {
-        if (user->password)
-        {
-            free(user->password);
-            user->password = 0;
-        }
-
         user->password = strdup(password);
         if (!user->password)
         {
@@ -144,14 +144,14 @@ void um_user_set_gid(um_user_t *user, gid_t gid)
  */
 int um_user_set_gecos(um_user_t *user, const char *gecos)
 {
+    if (user->gecos)
+    {
+        free(user->gecos);
+        user->gecos = 0;
+    }
+
     if (gecos)
     {
-        if (user->gecos)
-        {
-            free(user->gecos);
-            user->gecos = 0;
-        }
-
         user->gecos = strdup(gecos);
         if (!user->gecos)
         {
@@ -173,14 +173,14 @@ int um_user_set_gecos(um_user_t *user, const char *gecos)
  */
 int um_user_set_home_path(um_user_t *user, const char *path)
 {
+    if (user->home_path)
+    {
+        free(user->home_path);
+        user->home_path = 0;
+    }
+
     if (path)
     {
-        if (user->home_path)
-        {
-            free(user->home_path);
-            user->home_path = 0;
-        }
-
         user->home_path = strdup(path);
         if (!user->home_path)
         {
@@ -202,14 +202,14 @@ int um_user_set_home_path(um_user_t *user, const char *path)
  */
 int um_user_set_shell_path(um_user_t *user, const char *path)
 {
+    if (user->shell_path)
+    {
+        free(user->shell_path);
+        user->shell_path = 0;
+    }
+
     if (path)
     {
-        if (user->shell_path)
-        {
-            free(user->shell_path);
-            user->shell_path = 0;
-        }
-
         user->shell_path = strdup(path);
         if (!user->shell_path)
         {
@@ -231,14 +231,14 @@ int um_user_set_shell_path(um_user_t *user, const char *path)
  */
 int um_user_set_password_hash(um_user_t *user, const char *password_hash)
 {
+    if (user->shadow.password_hash)
+    {
+        free(user->shadow.password_hash);
+        user->shadow.password_hash = 0;
+    }
+
     if (password_hash)
     {
-        if (user->shadow.password_hash)
-        {
-            free(user->shadow.password_hash);
-            user->shadow.password_hash = 0;
-        }
-
         user->shadow.password_hash = strdup(password_hash);
         if (!user->shadow.password_hash)
         {
