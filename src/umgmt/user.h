@@ -18,6 +18,11 @@
 #include <pwd.h>
 #include <shadow.h>
 
+typedef enum {
+    PROC_CHECK,  // check if user has running processes
+    PROC_TERM    // SIGTERM all processes, automatic fallback to SIGKILL
+} process_operations;
+
 /**
  * Allocate new user.
  *
@@ -311,6 +316,16 @@ long int um_user_get_inactive_days(const um_user_t *user);
  *
  */
 long int um_user_get_expiration(const um_user_t *user);
+
+/**
+ * Kill all of user's processes. Recommended before user deletion on system
+ *
+ * @param user User to use.
+ *
+ * @return Error code - 0 on success.
+ *
+ */
+int um_user_kill_all_proc(const um_user_t *user);
 
 /**
  * Get user reserved flags.
