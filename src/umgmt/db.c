@@ -362,7 +362,7 @@ int um_db_store(um_db_t *db)
     }
 
     shadow_file = fopen("/etc/shadow", "w");
-    if (!passwd_file)
+    if (!shadow_file)
     {
         goto error_out;
     }
@@ -374,7 +374,7 @@ int um_db_store(um_db_t *db)
     }
 
     gshadow_file = fopen("/etc/gshadow", "w");
-    if (!gpasswd_file)
+    if (!gshadow_file)
     {
         goto error_out;
     }
