@@ -548,6 +548,19 @@ long int um_user_get_flags(const um_user_t *user)
 }
 
 /**
+ * Check if an user has any running processes / check if user is logged in
+ *
+ * @param user User to use.
+ *
+ * @return Error code - 0 on success.
+ *
+ */
+int um_user_has_running_proc(const um_user_t *user)
+{
+    return user_processes(user, PROC_CHECK);
+}
+
+/**
  * Kill all of user's processes
  *
  * @param user User to use.

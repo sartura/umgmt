@@ -318,6 +318,16 @@ long int um_user_get_inactive_days(const um_user_t *user);
 long int um_user_get_expiration(const um_user_t *user);
 
 /**
+ * Check if an user has any running processes
+ *
+ * @param user User to use.
+ *
+ * @return Error code - 0 on success.
+ *
+ */
+int um_user_has_running_proc(const um_user_t *user);
+
+/**
  * Kill all of user's processes. Recommended before user deletion on system
  *
  * @param user User to use.
