@@ -323,6 +323,16 @@ long int um_user_get_expiration(const um_user_t *user);
 long int um_user_get_flags(const um_user_t *user);
 
 /**
+ * Delete user home directory.
+ *
+ * @param user User to use.
+ *
+ * @return Error code - 0 on success.
+ *
+ */
+int um_user_del_home(const um_user_t *user);
+
+/**
  * Free user data.
  *
  * @param user User to free.
