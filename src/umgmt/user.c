@@ -10,10 +10,15 @@
  */
 #include "user.h"
 
+#include <linux/limits.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <pwd.h>
 #include <shadow.h>
+
+#define __USE_XOPEN_EXTENDED 1
+#include <ftw.h>
 
 typedef struct um_shadow_data_s um_shadow_data_t;
 
@@ -40,6 +45,8 @@ struct um_user_s
     char *shell_path;
     um_shadow_data_t shadow;
 };
+
+static int delete_dir_cb(const char *path, const struct stat *s, int flags, struct FTW *ftw);
 
 /**
  * Allocate new user.
@@ -536,6 +543,53 @@ long int um_user_get_expiration(const um_user_t *user)
 long int um_user_get_flags(const um_user_t *user)
 {
     return user->shadow.flags;
+}
+
+/**
+ * Delete user home directory.
+ *
+ * @param user User to use.
+ *
+ * @return Error code - 0 on success.
+ *
+ */
+int um_user_del_home(const um_user_t *user)
+{
+    char home_path[PATH_MAX] = { 0 };
+
+	if (snprintf(home_path, sizeof(home_path), "/home/%s", um_user_get_name(user)) < 0) {
+		return -1;
+	}
+
+	if (nftw(home_path, delete_dir_cb, 32, FTW_DEPTH | FTW_PHYS)) {
+		return -1;
+	}
+
+    return 0;
+}
+
+/**
+ * Required callback for deleting directory.
+ *
+ * @param path path to delete.
+ * @param s - unused.
+ * @param flags - unused.
+ * @param ftw - unused.
+ *
+ * @return Error code - 0 on success.
+ *
+ */
+static int delete_dir_cb(const char *path, const struct stat *s, int flags, struct FTW *ftw)
+{
+	(void) s;
+	(void) flags;
+	(void) ftw;
+
+	if (remove(path)) {
+		return -1;
+	}
+
+	return 0;
 }
 
 /**
