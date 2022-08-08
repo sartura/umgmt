@@ -48,7 +48,7 @@ struct um_user_s
     um_shadow_data_t shadow;
 };
 
-static int user_processes(const um_user_t *user, process_operations pop);
+static int user_processes(const um_user_t *user, bool *has_running, const bool kill_proc);
 
 /**
  * Allocate new user.
@@ -551,13 +551,13 @@ long int um_user_get_flags(const um_user_t *user)
  * Check if an user has any running processes / check if user is logged in
  *
  * @param user User to use.
- *
+ * @param running Set to true if user has running processes
  * @return Error code - 0 on success.
  *
  */
-int um_user_has_running_proc(const um_user_t *user)
+int um_user_has_running_proc(const um_user_t *user, bool *running)
 {
-    return user_processes(user, PROC_CHECK);
+    return user_processes(user, running, false);
 }
 
 /**
@@ -570,19 +570,22 @@ int um_user_has_running_proc(const um_user_t *user)
  */
 int um_user_kill_all_proc(const um_user_t *user)
 {
-    return user_processes(user, PROC_TERM);
+    // set but unchanged, required because of 'user_processes()' function signature
+    bool *running;
+    return user_processes(user, running, true);
 }
 
 /**
  * Check for users processes and do process_operations when running process(es) found
  *
  * @param user User to use.
- * @param process_operations operation to perform when a process for user is found
+ * @param has_running
+ * @param kill_proc SIGTERMs all found processes if set to 'true'
  *
  * @return Error code - 0 on success.
  *
  */
-static int user_processes(const um_user_t *user, process_operations pop)
+static int user_processes(const um_user_t *user, bool *has_running, const bool kill_proc)
 {
     int error = 0;
     DIR *proc_d = NULL;
@@ -598,6 +601,9 @@ static int user_processes(const um_user_t *user, process_operations pop)
     if (proc_d == NULL) {
         goto error_out;
     }
+
+    // stays unchanged if 'kill_proc == true'
+    *has_running = false;
 
     while ((proc = readdir(proc_d)) != NULL) {
         if (strcmp(proc->d_name, ".") && strcmp(proc->d_name, "..")) {
@@ -620,10 +626,11 @@ static int user_processes(const um_user_t *user, process_operations pop)
                 while (fgets (buf, sizeof(buf), status_f) == buf) {
                     if (sscanf(buf, "Uid:\t%lu", &proc_ruid) == 1) {
                         if (proc_ruid == user->uid) {
-                            if (pop == PROC_CHECK) {
+                            if (kill_proc == false) {
+                                *has_running = true;
                                 error = 0;
                                 goto out;
-                            } else if (pop == PROC_TERM) {
+                            } else if (kill_proc == true) {
                                 if (kill(proc_id, SIGTERM) != 0) {
                                     if (kill(proc_id, SIGKILL) != 0) {
                                         goto error_out;

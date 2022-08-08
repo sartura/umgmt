@@ -17,6 +17,7 @@
 
 #include <pwd.h>
 #include <shadow.h>
+#include <stdbool.h>
 
 typedef enum {
     PROC_CHECK,  // check if user has running processes
@@ -325,7 +326,7 @@ long int um_user_get_expiration(const um_user_t *user);
  * @return Error code - 0 on success.
  *
  */
-int um_user_has_running_proc(const um_user_t *user);
+int um_user_has_running_proc(const um_user_t *user, bool *running);
 
 /**
  * Kill all of user's processes. Recommended before user deletion on system
