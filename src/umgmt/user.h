@@ -19,11 +19,6 @@
 #include <shadow.h>
 #include <stdbool.h>
 
-typedef enum {
-    PROC_CHECK,  // check if user has running processes
-    PROC_TERM    // SIGTERM all processes, automatic fallback to SIGKILL
-} process_operations;
-
 /**
  * Allocate new user.
  *
