@@ -571,8 +571,8 @@ int um_user_has_running_proc(const um_user_t *user, bool *running)
 int um_user_kill_all_proc(const um_user_t *user)
 {
     // set but unchanged, required because of 'user_processes()' function signature
-    bool *running;
-    return user_processes(user, running, true);
+    bool running;
+    return user_processes(user, &running, true);
 }
 
 /**
