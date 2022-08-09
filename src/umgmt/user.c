@@ -10,10 +10,17 @@
  */
 #include "user.h"
 
-#include <string.h>
-#include <stdlib.h>
+#include "user.h"
+
+#include <dirent.h>
+#include <linux/limits.h>
 #include <pwd.h>
 #include <shadow.h>
+#include <signal.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <sys/types.h>
 
 typedef struct um_shadow_data_s um_shadow_data_t;
 
@@ -40,6 +47,8 @@ struct um_user_s
     char *shell_path;
     um_shadow_data_t shadow;
 };
+
+static int user_processes(const um_user_t *user, bool *has_running, const bool kill_proc);
 
 /**
  * Allocate new user.
@@ -536,6 +545,119 @@ long int um_user_get_expiration(const um_user_t *user)
 long int um_user_get_flags(const um_user_t *user)
 {
     return user->shadow.flags;
+}
+
+/**
+ * Check if an user has any running processes / check if user is logged in
+ *
+ * @param user User to use.
+ * @param running Set to true if user has running processes
+ * @return Error code - 0 on success.
+ *
+ */
+int um_user_has_running_proc(const um_user_t *user, bool *running)
+{
+    return user_processes(user, running, false);
+}
+
+/**
+ * Kill all of user's processes
+ *
+ * @param user User to use.
+ *
+ * @return Error code - 0 on success.
+ *
+ */
+int um_user_kill_all_proc(const um_user_t *user)
+{
+    // set but unchanged, required because of 'user_processes()' function signature
+    bool running;
+    return user_processes(user, &running, true);
+}
+
+/**
+ * Check for users processes and do process_operations when running process(es) found
+ *
+ * @param user User to use.
+ * @param has_running
+ * @param kill_proc SIGTERMs all found processes if set to 'true'
+ *
+ * @return Error code - 0 on success.
+ *
+ */
+static int user_processes(const um_user_t *user, bool *has_running, const bool kill_proc)
+{
+    int error = 0;
+    DIR *proc_d = NULL;
+    FILE *status_f = NULL;
+    struct dirent *proc = NULL;
+    char nums[] = "1234567890";
+    char status_path[NAME_MAX] = { 0 };
+    char buf[1024] = { 0 };
+    size_t proc_ruid = 0;
+    size_t proc_id = 0;
+
+    proc_d = opendir("/proc");
+    if (proc_d == NULL) {
+        goto error_out;
+    }
+
+    // stays unchanged if 'kill_proc == true'
+    *has_running = false;
+
+    while ((proc = readdir(proc_d)) != NULL) {
+        if (strcmp(proc->d_name, ".") && strcmp(proc->d_name, "..")) {
+            // check if directory name has only numbers
+            if (proc->d_type == DT_DIR && (strspn(proc->d_name, nums) == strlen(proc->d_name))) {
+                if (snprintf(status_path, NAME_MAX, "/proc/%s/status", proc->d_name) < 0) {
+                    goto error_out;
+                }
+
+                proc_id = strtol(proc->d_name, NULL, 10);
+                if (proc_id == 0) {
+                    goto error_out;
+                }
+
+                status_f = fopen(status_path, "r");
+                if (status_f == NULL) {
+                    goto error_out;
+                }
+
+                while (fgets (buf, sizeof(buf), status_f) == buf) {
+                    if (sscanf(buf, "Uid:\t%lu", &proc_ruid) == 1) {
+                        if (proc_ruid == user->uid) {
+                            if (kill_proc == false) {
+                                *has_running = true;
+                                error = 0;
+                                goto out;
+                            } else if (kill_proc == true) {
+                                if (kill(proc_id, SIGTERM) != 0) {
+                                    if (kill(proc_id, SIGKILL) != 0) {
+                                        goto error_out;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                fclose(status_f);
+                status_f = NULL;
+            }
+        }
+    }
+
+error_out:
+    error = -1;
+
+out:
+    if (proc_d) {
+        closedir(proc_d);
+    }
+    if (status_f) {
+        fclose(status_f);
+    }
+
+    return error;
 }
 
 /**

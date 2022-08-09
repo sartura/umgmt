@@ -17,6 +17,7 @@
 
 #include <pwd.h>
 #include <shadow.h>
+#include <stdbool.h>
 
 /**
  * Allocate new user.
@@ -311,6 +312,26 @@ long int um_user_get_inactive_days(const um_user_t *user);
  *
  */
 long int um_user_get_expiration(const um_user_t *user);
+
+/**
+ * Check if an user has any running processes
+ *
+ * @param user User to use.
+ *
+ * @return Error code - 0 on success.
+ *
+ */
+int um_user_has_running_proc(const um_user_t *user, bool *running);
+
+/**
+ * Kill all of user's processes. Recommended before user deletion on system
+ *
+ * @param user User to use.
+ *
+ * @return Error code - 0 on success.
+ *
+ */
+int um_user_kill_all_proc(const um_user_t *user);
 
 /**
  * Get user reserved flags.
