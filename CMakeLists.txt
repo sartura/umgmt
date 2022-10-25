@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.0.0)
 project(umgmt C)
 
 include(GNUInstallDirs)
+include(CompileOptions.cmake)
 
 include_directories(
     ${PROJECT_SOURCE_DIR}/src

@@ -171,7 +171,7 @@ void um_user_set_expiration(um_user_t *user, long int expiration);
  * @param flags Reserved flags.
  *
  */
-void um_user_set_flags(um_user_t *user, long int flags);
+void um_user_set_flags(um_user_t *user, unsigned long int flags);
 
 /**
  * Get user name.
@@ -341,7 +341,7 @@ int um_user_kill_all_proc(const um_user_t *user);
  * @return User reserved flags.
  *
  */
-long int um_user_get_flags(const um_user_t *user);
+unsigned long int um_user_get_flags(const um_user_t *user);
 
 /**
  * Free user data.

@@ -352,8 +352,8 @@ int um_db_store(um_db_t *db)
     bool members_allocated = false;
     bool admins_allocated = false;
 
-    int members_count = 0;
-    int admins_count = 0;
+    size_t members_count = 0;
+    size_t admins_count = 0;
 
     passwd_file = fopen("/etc/passwd", "w");
     if (!passwd_file)

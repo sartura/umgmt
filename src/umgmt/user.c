@@ -33,7 +33,7 @@ struct um_shadow_data_s
     long int warn_days;
     long int inactive_days;
     long int expiration;
-    long int flags;
+    unsigned long int flags;
 };
 
 struct um_user_s
@@ -347,7 +347,7 @@ void um_user_set_expiration(um_user_t *user, long int expiration)
  * @param flags Reserved flags.
  *
  */
-void um_user_set_flags(um_user_t *user, long int flags)
+void um_user_set_flags(um_user_t *user, unsigned long int flags)
 {
     user->shadow.flags = flags;
 }
@@ -542,7 +542,7 @@ long int um_user_get_expiration(const um_user_t *user)
  * @return User reserved flags.
  *
  */
-long int um_user_get_flags(const um_user_t *user)
+unsigned long int um_user_get_flags(const um_user_t *user)
 {
     return user->shadow.flags;
 }
@@ -592,47 +592,62 @@ static int user_processes(const um_user_t *user, bool *has_running, const bool k
     FILE *status_f = NULL;
     struct dirent *proc = NULL;
     char nums[] = "1234567890";
-    char status_path[NAME_MAX] = { 0 };
-    char buf[1024] = { 0 };
-    size_t proc_ruid = 0;
-    size_t proc_id = 0;
+    char status_path[NAME_MAX] = {0};
+    char buf[1024] = {0};
+    unsigned long proc_ruid = 0;
+    pid_t proc_id = 0;
 
     proc_d = opendir("/proc");
-    if (proc_d == NULL) {
+    if (proc_d == NULL)
+    {
         goto error_out;
     }
 
     // stays unchanged if 'kill_proc == true'
     *has_running = false;
 
-    while ((proc = readdir(proc_d)) != NULL) {
-        if (strcmp(proc->d_name, ".") && strcmp(proc->d_name, "..")) {
+    while ((proc = readdir(proc_d)) != NULL)
+    {
+        if (strcmp(proc->d_name, ".") && strcmp(proc->d_name, ".."))
+        {
             // check if directory name has only numbers
-            if (proc->d_type == DT_DIR && (strspn(proc->d_name, nums) == strlen(proc->d_name))) {
-                if (snprintf(status_path, NAME_MAX, "/proc/%s/status", proc->d_name) < 0) {
+            if (proc->d_type == DT_DIR && (strspn(proc->d_name, nums) == strlen(proc->d_name)))
+            {
+                if (snprintf(status_path, NAME_MAX, "/proc/%s/status", proc->d_name) < 0)
+                {
                     goto error_out;
                 }
 
-                proc_id = strtol(proc->d_name, NULL, 10);
-                if (proc_id == 0) {
+                proc_id = (pid_t)strtol(proc->d_name, NULL, 10);
+                if (proc_id == 0)
+                {
                     goto error_out;
                 }
 
                 status_f = fopen(status_path, "r");
-                if (status_f == NULL) {
+                if (status_f == NULL)
+                {
                     goto error_out;
                 }
 
-                while (fgets (buf, sizeof(buf), status_f) == buf) {
-                    if (sscanf(buf, "Uid:\t%lu", &proc_ruid) == 1) {
-                        if (proc_ruid == user->uid) {
-                            if (kill_proc == false) {
+                while (fgets(buf, sizeof(buf), status_f) == buf)
+                {
+                    if (sscanf(buf, "Uid:\t%lu", &proc_ruid) == 1)
+                    {
+                        if (proc_ruid == user->uid)
+                        {
+                            if (kill_proc == false)
+                            {
                                 *has_running = true;
                                 error = 0;
                                 goto out;
-                            } else if (kill_proc == true) {
-                                if (kill(proc_id, SIGTERM) != 0) {
-                                    if (kill(proc_id, SIGKILL) != 0) {
+                            }
+                            else if (kill_proc == true)
+                            {
+                                if (kill(proc_id, SIGTERM) != 0)
+                                {
+                                    if (kill(proc_id, SIGKILL) != 0)
+                                    {
                                         goto error_out;
                                     }
                                 }
@@ -650,10 +665,12 @@ error_out:
     error = -1;
 
 out:
-    if (proc_d) {
+    if (proc_d)
+    {
         closedir(proc_d);
     }
-    if (status_f) {
+    if (status_f)
+    {
         fclose(status_f);
     }
 
