@@ -2,6 +2,7 @@
 set(
     USER_UTEST_LINKER_OPTIONS
     "-Wl,--wrap=strdup"
+    "-Wl,--wrap=malloc"
 )
 add_executable(
     test_user

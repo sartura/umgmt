@@ -7,8 +7,17 @@
 
 #include <umgmt.h>
 
-// wrapped functions
+#include "umgmt/user.c"
+
+#define UM_USER_T_SIZE sizeof(um_user_t)
+
+// malloc
+void *__wrap_malloc(size_t size);
+extern void *__real_malloc(size_t size);
+
+// strdup
 char *__wrap_strdup(const char *s);
+extern char *__real_strdup(const char *s);
 
 static void test_user_new_correct(void **state);
 static void test_user_new_incorrect(void **state);
@@ -55,12 +64,17 @@ int main(void)
 static void test_user_new_correct(void **state)
 {
     (void)state;
+
     um_user_t *user = NULL;
 
     assert_null(user);
 
     // allocate a user
+    expect_value(__wrap_malloc, size, UM_USER_T_SIZE);
+    will_return(__wrap_malloc, __real_malloc(UM_USER_T_SIZE));
+
     user = um_user_new();
+
     assert_non_null(user);
 
     // assert all fields are set to NULL
@@ -86,11 +100,25 @@ static void test_user_new_correct(void **state)
     assert_int_equal(um_user_get_inactive_days(user), 0);
     assert_int_equal(um_user_get_expiration(user), 0);
     assert_int_equal(um_user_get_flags(user), 0);
+
+    um_user_free(user);
 }
 
 static void test_user_new_incorrect(void **state)
 {
     (void)state;
+
+    um_user_t *user = NULL;
+
+    assert_null(user);
+
+    // allocate a user - return NULL from malloc
+    expect_value(__wrap_malloc, size, UM_USER_T_SIZE);
+    will_return(__wrap_malloc, NULL);
+
+    user = um_user_new();
+
+    assert_null(user);
 }
 
 static void test_user_set_name_correct(void **state)
@@ -99,13 +127,23 @@ static void test_user_set_name_correct(void **state)
 
     int error = 0;
     char *name = "user1";
-    um_user_t *user = um_user_new();
+    um_user_t *user = NULL;
+
+    expect_value(__wrap_malloc, size, UM_USER_T_SIZE);
+    will_return(__wrap_malloc, __real_malloc(UM_USER_T_SIZE));
+
+    // allocate user
+    user = um_user_new();
+
+    assert_non_null(user);
 
     expect_string(__wrap_strdup, s, name);
-    will_return(__wrap_strdup, name);
+    will_return(__wrap_strdup, __real_strdup(name));
 
     error = um_user_set_name(user, name);
     assert_int_equal(error, 0);
+
+    um_user_free(user);
 }
 
 static void test_user_set_name_incorrect(void **state)
@@ -114,13 +152,22 @@ static void test_user_set_name_incorrect(void **state)
 
     int error = 0;
     char *name = "user1";
-    um_user_t *user = um_user_new();
+    um_user_t *user = NULL;
+
+    expect_value(__wrap_malloc, size, UM_USER_T_SIZE);
+    will_return(__wrap_malloc, __real_malloc(UM_USER_T_SIZE));
+
+    user = um_user_new();
+
+    assert_non_null(user);
 
     expect_string(__wrap_strdup, s, name);
     will_return(__wrap_strdup, NULL);
 
     error = um_user_set_name(user, name);
     assert_int_equal(error, -1);
+
+    um_user_free(user);
 }
 
 static void test_user_set_password_correct(void **state)
@@ -129,13 +176,22 @@ static void test_user_set_password_correct(void **state)
 
     int error = 0;
     char *password = "";
-    um_user_t *user = um_user_new();
+    um_user_t *user = NULL;
+
+    expect_value(__wrap_malloc, size, UM_USER_T_SIZE);
+    will_return(__wrap_malloc, __real_malloc(UM_USER_T_SIZE));
+
+    user = um_user_new();
+
+    assert_non_null(user);
 
     expect_string(__wrap_strdup, s, password);
-    will_return(__wrap_strdup, password);
+    will_return(__wrap_strdup, __real_strdup(password));
 
     error = um_user_set_password(user, password);
     assert_int_equal(error, 0);
+
+    um_user_free(user);
 }
 
 static void test_user_set_password_incorrect(void **state)
@@ -144,13 +200,22 @@ static void test_user_set_password_incorrect(void **state)
 
     int error = 0;
     char *password = "";
-    um_user_t *user = um_user_new();
+    um_user_t *user = NULL;
+
+    expect_value(__wrap_malloc, size, UM_USER_T_SIZE);
+    will_return(__wrap_malloc, __real_malloc(UM_USER_T_SIZE));
+
+    user = um_user_new();
+
+    assert_non_null(user);
 
     expect_string(__wrap_strdup, s, password);
     will_return(__wrap_strdup, NULL);
 
     error = um_user_set_password(user, password);
     assert_int_equal(error, -1);
+
+    um_user_free(user);
 }
 
 static void test_user_set_gecos_correct(void **state)
@@ -159,13 +224,22 @@ static void test_user_set_gecos_correct(void **state)
 
     int error = 0;
     char *gecos = "Some User Info";
-    um_user_t *user = um_user_new();
+    um_user_t *user = NULL;
+
+    expect_value(__wrap_malloc, size, UM_USER_T_SIZE);
+    will_return(__wrap_malloc, __real_malloc(UM_USER_T_SIZE));
+
+    user = um_user_new();
+
+    assert_non_null(user);
 
     expect_string(__wrap_strdup, s, gecos);
-    will_return(__wrap_strdup, gecos);
+    will_return(__wrap_strdup, __real_strdup(gecos));
 
     error = um_user_set_gecos(user, gecos);
     assert_int_equal(error, 0);
+
+    um_user_free(user);
 }
 
 static void test_user_set_gecos_incorrect(void **state)
@@ -174,13 +248,22 @@ static void test_user_set_gecos_incorrect(void **state)
 
     int error = 0;
     char *gecos = "Some User Info";
-    um_user_t *user = um_user_new();
+    um_user_t *user = NULL;
+
+    expect_value(__wrap_malloc, size, UM_USER_T_SIZE);
+    will_return(__wrap_malloc, __real_malloc(UM_USER_T_SIZE));
+
+    user = um_user_new();
+
+    assert_non_null(user);
 
     expect_string(__wrap_strdup, s, gecos);
     will_return(__wrap_strdup, NULL);
 
     error = um_user_set_gecos(user, gecos);
     assert_int_equal(error, -1);
+
+    um_user_free(user);
 }
 
 static void test_user_set_home_path_correct(void **state)
@@ -189,13 +272,22 @@ static void test_user_set_home_path_correct(void **state)
 
     int error = 0;
     char *home_path = "/home/user1";
-    um_user_t *user = um_user_new();
+    um_user_t *user = NULL;
+
+    expect_value(__wrap_malloc, size, UM_USER_T_SIZE);
+    will_return(__wrap_malloc, __real_malloc(UM_USER_T_SIZE));
+
+    user = um_user_new();
+
+    assert_non_null(user);
 
     expect_string(__wrap_strdup, s, home_path);
-    will_return(__wrap_strdup, home_path);
+    will_return(__wrap_strdup, __real_strdup(home_path));
 
     error = um_user_set_home_path(user, home_path);
     assert_int_equal(error, 0);
+
+    um_user_free(user);
 }
 
 static void test_user_set_home_path_incorrect(void **state)
@@ -204,13 +296,22 @@ static void test_user_set_home_path_incorrect(void **state)
 
     int error = 0;
     char *home_path = "/home/user1";
-    um_user_t *user = um_user_new();
+    um_user_t *user = NULL;
+
+    expect_value(__wrap_malloc, size, UM_USER_T_SIZE);
+    will_return(__wrap_malloc, __real_malloc(UM_USER_T_SIZE));
+
+    user = um_user_new();
+
+    assert_non_null(user);
 
     expect_string(__wrap_strdup, s, home_path);
     will_return(__wrap_strdup, NULL);
 
     error = um_user_set_home_path(user, home_path);
     assert_int_equal(error, -1);
+
+    um_user_free(user);
 }
 
 static void test_user_set_shell_path_correct(void **state)
@@ -219,13 +320,22 @@ static void test_user_set_shell_path_correct(void **state)
 
     int error = 0;
     char *shell_path = "/usr/bin/bash";
-    um_user_t *user = um_user_new();
+    um_user_t *user = NULL;
+
+    expect_value(__wrap_malloc, size, UM_USER_T_SIZE);
+    will_return(__wrap_malloc, __real_malloc(UM_USER_T_SIZE));
+
+    user = um_user_new();
+
+    assert_non_null(user);
 
     expect_string(__wrap_strdup, s, shell_path);
-    will_return(__wrap_strdup, shell_path);
+    will_return(__wrap_strdup, __real_strdup(shell_path));
 
     error = um_user_set_shell_path(user, shell_path);
     assert_int_equal(error, 0);
+
+    um_user_free(user);
 }
 
 static void test_user_set_shell_path_incorrect(void **state)
@@ -234,13 +344,22 @@ static void test_user_set_shell_path_incorrect(void **state)
 
     int error = 0;
     char *shell_path = "/usr/bin/bash";
-    um_user_t *user = um_user_new();
+    um_user_t *user = NULL;
+
+    expect_value(__wrap_malloc, size, UM_USER_T_SIZE);
+    will_return(__wrap_malloc, __real_malloc(UM_USER_T_SIZE));
+
+    user = um_user_new();
+
+    assert_non_null(user);
 
     expect_string(__wrap_strdup, s, shell_path);
     will_return(__wrap_strdup, NULL);
 
     error = um_user_set_shell_path(user, shell_path);
     assert_int_equal(error, -1);
+
+    um_user_free(user);
 }
 
 static void test_user_set_password_hash_correct(void **state)
@@ -250,13 +369,22 @@ static void test_user_set_password_hash_correct(void **state)
     int error = 0;
     char *password_hash = "0255a4237b05193cfbd43edb3d11c6296f7ea6825315e83d168f7b815674d2027a5bfed3582554db15982545a24b"
                           "09cb7b8323cf595c947e927ba610497f3537";
-    um_user_t *user = um_user_new();
+    um_user_t *user = NULL;
+
+    expect_value(__wrap_malloc, size, UM_USER_T_SIZE);
+    will_return(__wrap_malloc, __real_malloc(UM_USER_T_SIZE));
+
+    user = um_user_new();
+
+    assert_non_null(user);
 
     expect_string(__wrap_strdup, s, password_hash);
-    will_return(__wrap_strdup, password_hash);
+    will_return(__wrap_strdup, __real_strdup(password_hash));
 
     error = um_user_set_password_hash(user, password_hash);
     assert_int_equal(error, 0);
+
+    um_user_free(user);
 }
 
 static void test_user_set_password_hash_incorrect(void **state)
@@ -266,13 +394,28 @@ static void test_user_set_password_hash_incorrect(void **state)
     int error = 0;
     char *password_hash = "0255a4237b05193cfbd43edb3d11c6296f7ea6825315e83d168f7b815674d2027a5bfed3582554db15982545a24b"
                           "09cb7b8323cf595c947e927ba610497f3537";
-    um_user_t *user = um_user_new();
+    um_user_t *user = NULL;
+
+    expect_value(__wrap_malloc, size, UM_USER_T_SIZE);
+    will_return(__wrap_malloc, __real_malloc(UM_USER_T_SIZE));
+
+    user = um_user_new();
+
+    assert_non_null(user);
 
     expect_string(__wrap_strdup, s, password_hash);
     will_return(__wrap_strdup, NULL);
 
     error = um_user_set_password_hash(user, password_hash);
     assert_int_equal(error, -1);
+
+    um_user_free(user);
+}
+
+void *__wrap_malloc(size_t size)
+{
+    check_expected(size);
+    return mock_ptr_type(void *);
 }
 
 char *__wrap_strdup(const char *s)
