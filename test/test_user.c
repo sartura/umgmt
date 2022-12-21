@@ -8,11 +8,7 @@
 #include <umgmt.h>
 
 // wrapped functions
-char *__wrap_strdup(const char *s)
-{
-    check_expected(s);
-    return (char *)mock();
-}
+char *__wrap_strdup(const char *s);
 
 static void test_user_new_correct(void **state);
 static void test_user_new_incorrect(void **state);
@@ -277,4 +273,10 @@ static void test_user_set_password_hash_incorrect(void **state)
 
     error = um_user_set_password_hash(user, password_hash);
     assert_int_equal(error, -1);
+}
+
+char *__wrap_strdup(const char *s)
+{
+    check_expected(s);
+    return (char *)mock();
 }
