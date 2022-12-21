@@ -1,23 +1,14 @@
-#include "umgmt/user.h"
 #include <stdarg.h>
 #include <stddef.h>
 #include <setjmp.h>
 #include <cmocka.h>
-#include <stdio.h>
 
 #include <umgmt.h>
+#include "common.h"
 
 #include "umgmt/user.c"
 
 #define UM_USER_T_SIZE sizeof(um_user_t)
-
-// malloc
-void *__wrap_malloc(size_t size);
-extern void *__real_malloc(size_t size);
-
-// strdup
-char *__wrap_strdup(const char *s);
-extern char *__real_strdup(const char *s);
 
 static void test_user_new_correct(void **state);
 static void test_user_new_incorrect(void **state);
@@ -410,16 +401,4 @@ static void test_user_set_password_hash_incorrect(void **state)
     assert_int_equal(error, -1);
 
     um_user_free(user);
-}
-
-void *__wrap_malloc(size_t size)
-{
-    check_expected(size);
-    return mock_ptr_type(void *);
-}
-
-char *__wrap_strdup(const char *s)
-{
-    check_expected(s);
-    return mock_ptr_type(char *);
 }

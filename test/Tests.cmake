@@ -8,6 +8,7 @@ add_executable(
     test_user
 
     test/test_user.c
+    test/common.c
 )
 
 target_link_libraries(
@@ -32,6 +33,7 @@ add_executable(
     test_group
 
     test/test_group.c
+    test/common.c
 )
 
 target_link_libraries(

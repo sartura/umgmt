@@ -8,18 +8,10 @@
 #include <stdlib.h>
 
 #include <umgmt.h>
-
+#include "common.h"
 #include "umgmt/group.c"
 
 #define UM_GROUP_T_SIZE sizeof(um_group_t)
-
-// malloc
-void *__wrap_malloc(size_t size);
-extern void *__real_malloc(size_t size);
-
-// strdup
-char *__wrap_strdup(const char *s);
-extern char *__real_strdup(const char *s);
 
 static void test_group_new_correct(void **state);
 static void test_group_new_incorrect(void **state);
@@ -238,16 +230,4 @@ static void test_group_set_password_hash_incorrect(void **state)
     assert_int_equal(error, -1);
 
     um_group_free(group);
-}
-
-void *__wrap_malloc(size_t size)
-{
-    check_expected(size);
-    return mock_ptr_type(void *);
-}
-
-char *__wrap_strdup(const char *s)
-{
-    check_expected(s);
-    return mock_ptr_type(char *);
 }
