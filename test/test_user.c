@@ -278,5 +278,5 @@ static void test_user_set_password_hash_incorrect(void **state)
 char *__wrap_strdup(const char *s)
 {
     check_expected(s);
-    return (char *)mock();
+    return mock_ptr_type(char *);
 }
