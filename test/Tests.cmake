@@ -23,7 +23,7 @@ add_test(NAME test_user COMMAND test_user)
 # test group data type
 set(
     GROUP_UTEST_LINKER_OPTIONS
-    "-Wl,--wrap=strdup"
+    "-Wl,--wrap=malloc"
 )
 
 add_executable(
