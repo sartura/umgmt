@@ -13,9 +13,13 @@
 
 #define UM_GROUP_T_SIZE sizeof(um_group_t)
 
+// malloc
 void *__wrap_malloc(size_t size);
-void *__real_malloc(size_t size);
+extern void *__real_malloc(size_t size);
+
+// strdup
 char *__wrap_strdup(const char *s);
+extern char *__real_strdup(const char *s);
 
 static void test_group_new_correct(void **state);
 static void test_group_new_incorrect(void **state);
@@ -88,7 +92,9 @@ static void test_group_set_name_correct(void **state)
 {
     (void)state;
 
+    int error = 0;
     um_group_t *group = NULL;
+    const char *group_name = "Group1";
 
     assert_null(group);
 
@@ -98,12 +104,38 @@ static void test_group_set_name_correct(void **state)
     group = um_group_new();
     assert_non_null(group);
 
-    // set name using wrapped strdup
+    expect_string(__wrap_strdup, s, group_name);
+    will_return(__wrap_strdup, __real_strdup(group_name));
+
+    error = um_group_set_name(group, group_name);
+    assert_int_equal(error, 0);
+
+    um_group_free(group);
 }
 
 static void test_group_set_name_incorrect(void **state)
 {
     (void)state;
+
+    int error = 0;
+    um_group_t *group = NULL;
+    const char *group_name = "Group1";
+
+    assert_null(group);
+
+    expect_value(__wrap_malloc, size, UM_GROUP_T_SIZE);
+    will_return(__wrap_malloc, __real_malloc(UM_GROUP_T_SIZE));
+
+    group = um_group_new();
+    assert_non_null(group);
+
+    expect_string(__wrap_strdup, s, group_name);
+    will_return(__wrap_strdup, NULL);
+
+    error = um_group_set_name(group, group_name);
+    assert_int_equal(error, -1);
+
+    um_group_free(group);
 }
 
 static void test_group_set_password_correct(void **state)
