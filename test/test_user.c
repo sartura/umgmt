@@ -213,9 +213,29 @@ static void test_user_set_home_path_incorrect(void **state)
 static void test_user_set_shell_path_correct(void **state)
 {
     (void)state;
+
+    int error = 0;
+    char *shell_path = "/usr/bin/bash";
+    um_user_t *user = um_user_new();
+
+    expect_string(__wrap_strdup, s, shell_path);
+    will_return(__wrap_strdup, shell_path);
+
+    error = um_user_set_shell_path(user, shell_path);
+    assert_int_equal(error, 0);
 }
 
 static void test_user_set_shell_path_incorrect(void **state)
 {
     (void)state;
+
+    int error = 0;
+    char *shell_path = "/usr/bin/bash";
+    um_user_t *user = um_user_new();
+
+    expect_string(__wrap_strdup, s, shell_path);
+    will_return(__wrap_strdup, NULL);
+
+    error = um_user_set_shell_path(user, shell_path);
+    assert_int_equal(error, -1);
 }
