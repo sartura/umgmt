@@ -74,6 +74,7 @@ static void test_user_new_incorrect(void **state)
 static void test_user_set_name_correct(void **state)
 {
     (void)state;
+
     int error = 0;
     char *name = "user1";
     um_user_t *user = um_user_new();
@@ -88,6 +89,7 @@ static void test_user_set_name_correct(void **state)
 static void test_user_set_name_incorrect(void **state)
 {
     (void)state;
+
     int error = 0;
     char *name = "user1";
     um_user_t *user = um_user_new();
@@ -102,9 +104,29 @@ static void test_user_set_name_incorrect(void **state)
 static void test_user_set_password_correct(void **state)
 {
     (void)state;
+
+    int error = 0;
+    char *password = "";
+    um_user_t *user = um_user_new();
+
+    expect_string(__wrap_strdup, s, password);
+    will_return(__wrap_strdup, password);
+
+    error = um_user_set_password(user, password);
+    assert_int_equal(error, 0);
 }
 
 static void test_user_set_password_incorrect(void **state)
 {
     (void)state;
+
+    int error = 0;
+    char *password = "";
+    um_user_t *user = um_user_new();
+
+    expect_string(__wrap_strdup, s, password);
+    will_return(__wrap_strdup, NULL);
+
+    error = um_user_set_password(user, password);
+    assert_int_equal(error, -1);
 }
