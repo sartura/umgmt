@@ -1,3 +1,4 @@
+#include "umgmt/user.h"
 #include <stdarg.h>
 #include <stddef.h>
 #include <setjmp.h>
@@ -22,12 +23,30 @@ static void test_user_set_name_incorrect(void **state);
 static void test_user_set_password_correct(void **state);
 static void test_user_set_password_incorrect(void **state);
 
+static void test_user_set_gecos_correct(void **state);
+static void test_user_set_gecos_incorrect(void **state);
+
+static void test_user_set_home_path_correct(void **state);
+static void test_user_set_home_path_incorrect(void **state);
+
+static void test_user_set_shell_path_correct(void **state);
+static void test_user_set_shell_path_incorrect(void **state);
+
 int main(void)
 {
     const struct CMUnitTest tests[] = {
-        cmocka_unit_test(test_user_new_correct),          cmocka_unit_test(test_user_new_incorrect),
-        cmocka_unit_test(test_user_set_name_correct),     cmocka_unit_test(test_user_set_name_incorrect),
-        cmocka_unit_test(test_user_set_password_correct), cmocka_unit_test(test_user_set_password_incorrect),
+        cmocka_unit_test(test_user_new_correct),
+        cmocka_unit_test(test_user_new_incorrect),
+        cmocka_unit_test(test_user_set_name_correct),
+        cmocka_unit_test(test_user_set_name_incorrect),
+        cmocka_unit_test(test_user_set_password_correct),
+        cmocka_unit_test(test_user_set_password_incorrect),
+        cmocka_unit_test(test_user_set_gecos_correct),
+        cmocka_unit_test(test_user_set_gecos_incorrect),
+        cmocka_unit_test(test_user_set_home_path_correct),
+        cmocka_unit_test(test_user_set_home_path_incorrect),
+        cmocka_unit_test(test_user_set_shell_path_correct),
+        cmocka_unit_test(test_user_set_shell_path_incorrect),
     };
     return cmocka_run_group_tests(tests, NULL, NULL);
 }
@@ -129,4 +148,54 @@ static void test_user_set_password_incorrect(void **state)
 
     error = um_user_set_password(user, password);
     assert_int_equal(error, -1);
+}
+
+static void test_user_set_gecos_correct(void **state)
+{
+    (void)state;
+
+    int error = 0;
+    char *gecos = "Some User Info";
+    um_user_t *user = um_user_new();
+
+    expect_string(__wrap_strdup, s, gecos);
+    will_return(__wrap_strdup, gecos);
+
+    error = um_user_set_gecos(user, gecos);
+    assert_int_equal(error, 0);
+}
+
+static void test_user_set_gecos_incorrect(void **state)
+{
+    (void)state;
+
+    int error = 0;
+    char *gecos = "Some User Info";
+    um_user_t *user = um_user_new();
+
+    expect_string(__wrap_strdup, s, gecos);
+    will_return(__wrap_strdup, NULL);
+
+    error = um_user_set_gecos(user, gecos);
+    assert_int_equal(error, -1);
+}
+
+static void test_user_set_home_path_correct(void **state)
+{
+    (void)state;
+}
+
+static void test_user_set_home_path_incorrect(void **state)
+{
+    (void)state;
+}
+
+static void test_user_set_shell_path_correct(void **state)
+{
+    (void)state;
+}
+
+static void test_user_set_shell_path_incorrect(void **state)
+{
+    (void)state;
 }
