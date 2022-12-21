@@ -191,11 +191,53 @@ static void test_group_set_password_incorrect(void **state)
 static void test_group_set_password_hash_correct(void **state)
 {
     (void)state;
+
+    int error = 0;
+    um_group_t *group = NULL;
+    const char *password_hash = "d80361e865ac54b8e409f3c908bc9803adff7633c8793881877ae46295c5746e965f39e2ddce8f42db1afd"
+                                "65cbc86b54f638e1fd37e3c44343428337e05f59ab";
+
+    assert_null(group);
+
+    expect_value(__wrap_malloc, size, UM_GROUP_T_SIZE);
+    will_return(__wrap_malloc, __real_malloc(UM_GROUP_T_SIZE));
+
+    group = um_group_new();
+    assert_non_null(group);
+
+    expect_string(__wrap_strdup, s, password_hash);
+    will_return(__wrap_strdup, __real_strdup(password_hash));
+
+    error = um_group_set_password_hash(group, password_hash);
+    assert_int_equal(error, 0);
+
+    um_group_free(group);
 }
 
 static void test_group_set_password_hash_incorrect(void **state)
 {
     (void)state;
+
+    int error = 0;
+    um_group_t *group = NULL;
+    const char *password_hash = "d80361e865ac54b8e409f3c908bc9803adff7633c8793881877ae46295c5746e965f39e2ddce8f42db1afd"
+                                "65cbc86b54f638e1fd37e3c44343428337e05f59ab";
+
+    assert_null(group);
+
+    expect_value(__wrap_malloc, size, UM_GROUP_T_SIZE);
+    will_return(__wrap_malloc, __real_malloc(UM_GROUP_T_SIZE));
+
+    group = um_group_new();
+    assert_non_null(group);
+
+    expect_string(__wrap_strdup, s, password_hash);
+    will_return(__wrap_strdup, NULL);
+
+    error = um_group_set_password_hash(group, password_hash);
+    assert_int_equal(error, -1);
+
+    um_group_free(group);
 }
 
 void *__wrap_malloc(size_t size)
