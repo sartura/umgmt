@@ -48,10 +48,16 @@ target_link_options(test_group PRIVATE ${GROUP_UTEST_LINKER_OPTIONS})
 add_test(NAME test_group COMMAND test_group)
 
 # test database data type
+set(
+    DB_UTEST_LINKER_OPTIONS
+    "-Wl,--wrap=strdup"
+    "-Wl,--wrap=malloc"
+)
 add_executable(
     test_db
 
     test/test_db.c
+    test/common.c
 )
 
 target_link_libraries(
@@ -62,4 +68,5 @@ target_link_libraries(
     ${LIBYANG_LIBRARIES}
     ${CMAKE_PROJECT_NAME}
 )
+target_link_options(test_db PRIVATE ${GROUP_UTEST_LINKER_OPTIONS})
 add_test(NAME test_db COMMAND test_db)
