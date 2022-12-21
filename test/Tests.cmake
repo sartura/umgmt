@@ -1,16 +1,50 @@
+# test user data type
 add_executable(
-    test_lib
+    test_user
 
-    test/test_lib.c
+    test/test_user.c
 )
 
 target_link_libraries(
-    test_lib
+    test_user
 
     ${CMOCKA_LIBRARIES}
     ${SYSREPO_LIBRARIES}
     ${LIBYANG_LIBRARIES}
     ${CMAKE_PROJECT_NAME}
 )
+add_test(NAME test_user COMMAND test_user)
 
-add_test(NAME test_lib COMMAND test_lib)
+# test group data type
+add_executable(
+    test_group
+
+    test/test_group.c
+)
+
+target_link_libraries(
+    test_group
+
+    ${CMOCKA_LIBRARIES}
+    ${SYSREPO_LIBRARIES}
+    ${LIBYANG_LIBRARIES}
+    ${CMAKE_PROJECT_NAME}
+)
+add_test(NAME test_group COMMAND test_group)
+
+# test database data type
+add_executable(
+    test_db
+
+    test/test_db.c
+)
+
+target_link_libraries(
+    test_db
+
+    ${CMOCKA_LIBRARIES}
+    ${SYSREPO_LIBRARIES}
+    ${LIBYANG_LIBRARIES}
+    ${CMAKE_PROJECT_NAME}
+)
+add_test(NAME test_db COMMAND test_db)
