@@ -141,11 +141,51 @@ static void test_group_set_name_incorrect(void **state)
 static void test_group_set_password_correct(void **state)
 {
     (void)state;
+
+    int error = 0;
+    um_group_t *group = NULL;
+    const char *group_password = "";
+
+    assert_null(group);
+
+    expect_value(__wrap_malloc, size, UM_GROUP_T_SIZE);
+    will_return(__wrap_malloc, __real_malloc(UM_GROUP_T_SIZE));
+
+    group = um_group_new();
+    assert_non_null(group);
+
+    expect_string(__wrap_strdup, s, group_password);
+    will_return(__wrap_strdup, __real_strdup(group_password));
+
+    error = um_group_set_password(group, group_password);
+    assert_int_equal(error, 0);
+
+    um_group_free(group);
 }
 
 static void test_group_set_password_incorrect(void **state)
 {
     (void)state;
+
+    int error = 0;
+    um_group_t *group = NULL;
+    const char *group_password = "";
+
+    assert_null(group);
+
+    expect_value(__wrap_malloc, size, UM_GROUP_T_SIZE);
+    will_return(__wrap_malloc, __real_malloc(UM_GROUP_T_SIZE));
+
+    group = um_group_new();
+    assert_non_null(group);
+
+    expect_string(__wrap_strdup, s, group_password);
+    will_return(__wrap_strdup, NULL);
+
+    error = um_group_set_password(group, group_password);
+    assert_int_equal(error, -1);
+
+    um_group_free(group);
 }
 
 static void test_group_set_password_hash_correct(void **state)
