@@ -1,20 +1,33 @@
-#include "umgmt/types.h"
-#include "umgmt/user.h"
 #include <stdarg.h>
 #include <stddef.h>
 #include <setjmp.h>
 #include <cmocka.h>
+#include <stdio.h>
 
 #include <umgmt.h>
+
+// wrapped functions
+char *__wrap_strdup(const char *s)
+{
+    check_expected(s);
+    return (char *)mock();
+}
 
 static void test_user_new_correct(void **state);
 static void test_user_new_incorrect(void **state);
 
+static void test_user_set_name_correct(void **state);
+static void test_user_set_name_incorrect(void **state);
+
+static void test_user_set_password_correct(void **state);
+static void test_user_set_password_incorrect(void **state);
+
 int main(void)
 {
     const struct CMUnitTest tests[] = {
-        cmocka_unit_test(test_user_new_correct),
-        cmocka_unit_test(test_user_new_incorrect),
+        cmocka_unit_test(test_user_new_correct),          cmocka_unit_test(test_user_new_incorrect),
+        cmocka_unit_test(test_user_set_name_correct),     cmocka_unit_test(test_user_set_name_incorrect),
+        cmocka_unit_test(test_user_set_password_correct), cmocka_unit_test(test_user_set_password_incorrect),
     };
     return cmocka_run_group_tests(tests, NULL, NULL);
 }
@@ -54,6 +67,44 @@ static void test_user_new_correct(void **state)
 }
 
 static void test_user_new_incorrect(void **state)
+{
+    (void)state;
+}
+
+static void test_user_set_name_correct(void **state)
+{
+    (void)state;
+    int error = 0;
+    char *name = "user1";
+    um_user_t *user = um_user_new();
+
+    expect_string(__wrap_strdup, s, name);
+    will_return(__wrap_strdup, name);
+
+    error = um_user_set_name(user, name);
+    assert_int_equal(error, 0);
+}
+
+static void test_user_set_name_incorrect(void **state)
+{
+    (void)state;
+    int error = 0;
+    char *name = "user1";
+    um_user_t *user = um_user_new();
+
+    expect_string(__wrap_strdup, s, name);
+    will_return(__wrap_strdup, NULL);
+
+    error = um_user_set_name(user, name);
+    assert_int_equal(error, -1);
+}
+
+static void test_user_set_password_correct(void **state)
+{
+    (void)state;
+}
+
+static void test_user_set_password_incorrect(void **state)
 {
     (void)state;
 }

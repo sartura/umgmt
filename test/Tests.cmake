@@ -1,3 +1,8 @@
+set(
+    USER_UTEST_LINKER_OPTIONS
+    "-Wl,--wrap=strdup"
+)
+
 # test user data type
 add_executable(
     test_user
@@ -13,6 +18,7 @@ target_link_libraries(
     ${LIBYANG_LIBRARIES}
     ${CMAKE_PROJECT_NAME}
 )
+target_link_options(test_user PRIVATE ${USER_UTEST_LINKER_OPTIONS})
 add_test(NAME test_user COMMAND test_user)
 
 # test group data type
