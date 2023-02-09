@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.0.0)
-project(umgmt C)
+project(
+    umgmt
+    VERSION 0.1.0
+    LANGUAGES C
+)
 
 include(GNUInstallDirs)
 include(CompileOptions.cmake)
@@ -19,12 +23,21 @@ set(
 
 add_library(
     ${CMAKE_PROJECT_NAME}
+    SHARED
     ${UMGMT_SOURCES}
 )
 
 install(
     TARGETS ${PROJECT_NAME}
     DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)
+
+# project version
+set_target_properties(
+    ${PROJECT_NAME}
+    PROPERTIES
+    VERSION ${PROJECT_VERSION}
+    SOVERSION ${PROJECT_VERSION_MAJOR}
 )
 
 install(
