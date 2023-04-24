@@ -19,6 +19,7 @@ set(
     "src/umgmt/user.c"
     "src/umgmt/group.c"
     "src/umgmt/db.c"
+    "src/umgmt/password.c"
 )
 
 add_library(

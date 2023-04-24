@@ -80,4 +80,14 @@ struct um_group_user_element_s
     um_group_user_element_t *next; ///< Link to the next list node.
 };
 
+/**
+ * Shadow files (/etc/shadow and /etc/gshadow) password hash data structure.
+ */
+struct um_shadow_password_s
+{
+    const char *algorithm; ///< Algorithm used for hashing the password.
+    const char *salt;      ///< Salt used for the hash.
+    const char *hash;      ///< Hash of the password.
+};
+
 #endif // UMGMT_TYPES_H
