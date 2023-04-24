@@ -17,7 +17,14 @@
  *
  * @return New shadow password data structure with NULL initialized fields.
  */
-um_shadow_password_t um_shadow_password_new(void);
+um_shadow_password_t um_shadow_password_new(void)
+{
+    return (um_shadow_password_t){
+        .algorithm = NULL,
+        .salt = NULL,
+        .hash = NULL,
+    };
+}
 
 /**
  * Parse the given string into the shadow password data type.
@@ -91,4 +98,23 @@ int um_shadow_password_set_hash(um_shadow_password_t *shp, const byte_t *hash, s
  * @param shp Shadow password to free.
  *
  */
-void um_shadow_password_free(um_shadow_password_t *shp);
+void um_shadow_password_free(um_shadow_password_t *shp)
+{
+    if (shp->algorithm)
+    {
+        free(shp->algorithm);
+        shp->algorithm = NULL;
+    }
+
+    if (shp->salt)
+    {
+        free(shp->salt);
+        shp->salt = NULL;
+    }
+
+    if (shp->hash)
+    {
+        free(shp->hash);
+        shp->hash = NULL;
+    }
+}
