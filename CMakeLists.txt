@@ -20,6 +20,7 @@ set(
     "src/umgmt/group.c"
     "src/umgmt/db.c"
     "src/umgmt/password.c"
+	"src/umgmt/dyn_buffer.c"
 )
 
 add_library(

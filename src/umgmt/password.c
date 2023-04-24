@@ -11,7 +11,8 @@
  *     https://opensource.org/licenses/BSD-3-Clause
  */
 #include "password.h"
-#include "umgmt/types.h"
+#include "types.h"
+#include "dyn_buffer.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -25,8 +26,8 @@ um_shadow_password_t um_shadow_password_new(void)
 {
     return (um_shadow_password_t){
         .algorithm = NULL,
-        .salt = NULL,
-        .hash = NULL,
+        .salt = um_dyn_byte_buffer_new(),
+        .hash = um_dyn_byte_buffer_new(),
     };
 }
 
@@ -231,18 +232,10 @@ void um_shadow_password_free(um_shadow_password_t *shp)
     if (shp->algorithm)
     {
         free(shp->algorithm);
-        shp->algorithm = NULL;
     }
 
-    if (shp->salt)
-    {
-        free(shp->salt);
-        shp->salt = NULL;
-    }
+    um_dyn_byte_buffer_free(&shp->salt);
+    um_dyn_byte_buffer_free(&shp->hash);
 
-    if (shp->hash)
-    {
-        free(shp->hash);
-        shp->hash = NULL;
-    }
+    *shp = um_shadow_password_new();
 }

@@ -13,6 +13,8 @@
 #ifndef UMGMT_TYPES_H
 #define UMGMT_TYPES_H
 
+#include <stdlib.h>
+
 /**
  * Byte type alias.
  */
@@ -69,6 +71,11 @@ typedef struct um_group_db_s um_group_db_t;
 typedef struct um_db_s um_db_t;
 
 /**
+ * Dynamic buffer data type alias.
+ */
+typedef struct um_dyn_byte_buffer_s um_dyn_byte_buffer_t;
+
+/**
  * User list element.
  */
 struct um_user_element_s
@@ -96,13 +103,23 @@ struct um_group_user_element_s
 };
 
 /**
+ * Dynamically allocated byte buffer.
+ * Used for salt and hash data.
+ */
+struct um_dyn_byte_buffer_s
+{
+    byte_t *buffer; ///< Allocated byte data.
+    size_t size;    ///< Size of the buffer.
+};
+
+/**
  * Shadow files (/etc/shadow and /etc/gshadow) password hash data structure.
  */
 struct um_shadow_password_s
 {
-    char *algorithm; ///< Algorithm used for hashing the password.
-    byte_t *salt;    ///< Salt used for the hash.
-    byte_t *hash;    ///< Hash of the password.
+    char *algorithm;           ///< Algorithm used for hashing the password.
+    um_dyn_byte_buffer_t salt; ///< Salt used for the hash.
+    um_dyn_byte_buffer_t hash; ///< Hash of the password.
 };
 
 /**
