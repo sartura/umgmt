@@ -208,7 +208,15 @@ out:
  *
  * @return Error code (0 on success).
  */
-int um_shadow_password_set_salt(um_shadow_password_t *shp, const byte_t *salt, size_t n);
+int um_shadow_password_set_salt(um_shadow_password_t *shp, const byte_t *salt, size_t n)
+{
+    return um_dyn_byte_buffer_copy(
+        &(um_dyn_byte_buffer_t){
+            .buffer = (byte_t *)salt,
+            .size = n,
+        },
+        &shp->salt);
+}
 
 /**
  * Set the hash of the given shadow password.
@@ -219,7 +227,15 @@ int um_shadow_password_set_salt(um_shadow_password_t *shp, const byte_t *salt, s
  *
  * @return Error code (0 on success).
  */
-int um_shadow_password_set_hash(um_shadow_password_t *shp, const byte_t *hash, size_t n);
+int um_shadow_password_set_hash(um_shadow_password_t *shp, const byte_t *hash, size_t n)
+{
+    return um_dyn_byte_buffer_copy(
+        &(um_dyn_byte_buffer_t){
+            .buffer = (byte_t *)hash,
+            .size = n,
+        },
+        &shp->hash);
+}
 
 /**
  * Free the given shadow password.
