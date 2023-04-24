@@ -169,7 +169,34 @@ const char *um_shadow_password_algorithm_id2str(um_hash_algorithm_t id)
  *
  * @return Error code (0 on success).
  */
-int um_shadow_password_set_algorithm_id(um_shadow_password_t *shp, const char *alg_id);
+int um_shadow_password_set_algorithm_id(um_shadow_password_t *shp, const char *alg_id)
+{
+    int error = 0;
+
+    const size_t len = strlen(alg_id);
+
+    if (shp->algorithm)
+    {
+        // [TODO]: decide what to do if this is the case
+    }
+
+    shp->algorithm = (char *)malloc(sizeof(char) * len);
+    if (shp->algorithm == NULL)
+    {
+        goto error_out;
+    }
+
+    memcpy(shp->algorithm, alg_id, len);
+
+    // successful end
+    goto out;
+
+error_out:
+    error = -1;
+
+out:
+    return error;
+}
 
 /**
  * Set the salt of the given shadow password.
