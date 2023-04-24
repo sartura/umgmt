@@ -16,6 +16,7 @@
 
 #include <string.h>
 #include <stdio.h>
+#include <assert.h>
 
 /**
  * Create a new shadow password data structure.
@@ -39,7 +40,71 @@ um_shadow_password_t um_shadow_password_new(void)
  *
  * @return Error code (0 on success).
  */
-int um_shadow_password_parse_hash(const char *password_hash, um_shadow_password_t *shp);
+int um_shadow_password_parse_hash(const char *password_hash, um_shadow_password_t *shp)
+{
+    // tokenize password hash and store shadow and password data
+    int error = 0;
+    char *token = NULL;
+    size_t count = 0;
+    um_shadow_password_t temp = um_shadow_password_new();
+
+    // split string into 3 parts - algorithm, salt and hash
+    char *tokens[3] = {0, 0, 0};
+
+    token = strtok((char *)password_hash, "$");
+    while (token)
+    {
+        tokens[count] = strdup(token);
+        ++count;
+        token = strtok(NULL, "$");
+    }
+
+    // assert non null
+    for (size_t i = 0; i < 3; i++)
+    {
+        assert(tokens[i] != NULL);
+    }
+
+    // use tokens to create the password data structure
+    const char *algorithm = tokens[0];
+    const byte_t *salt = (const byte_t *)tokens[1];
+    const byte_t *hash = (const byte_t *)tokens[2];
+
+    size_t salt_len = strlen((const char *)salt);
+    size_t hash_len = strlen((const char *)hash);
+
+    error = um_shadow_password_set_algorithm_id(&temp, algorithm);
+    if (error != 0)
+    {
+        goto error_out;
+    }
+
+    error = um_shadow_password_set_salt(&temp, salt, salt_len);
+    if (error != 0)
+    {
+        goto error_out;
+    }
+
+    error = um_shadow_password_set_hash(&temp, hash, hash_len);
+    if (error != 0)
+    {
+        goto error_out;
+    }
+
+    goto out;
+
+error_out:
+    error = -1;
+
+out:
+    // free allocated data
+    for (size_t i = 0; i < 3; i++)
+    {
+        free(tokens[i]);
+    }
+
+    return 0;
+}
 
 /**
  * Create the shadow password from the plaintext password.
