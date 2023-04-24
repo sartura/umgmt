@@ -1,6 +1,6 @@
 /**
- * @file group.h
- * @brief API for the group abstract data type.
+ * @file password.c
+ * @brief API for the password handling.
  *
  * Copyright (c) 2022 Sartura Ltd.
  *
@@ -11,6 +11,10 @@
  *     https://opensource.org/licenses/BSD-3-Clause
  */
 #include "password.h"
+#include "umgmt/types.h"
+
+#include <string.h>
+#include <stdio.h>
 
 /**
  * Create a new shadow password data structure.
@@ -50,15 +54,112 @@ int um_shadow_password_from_plaintext(const char *password, const char *algorith
                                       um_shadow_password_t *shp);
 
 /**
- * Convert the algorithm name to the id which will be written to the shadow data.
+ * Convert the algorithm name to the um_hash_algorithm_t enum value.
  *
- * @param algorithm Algorithm name (md5, sha256, sha512, blowfish etc.) All lowercase.
- * @param id_buffer Buffer to write the id to.
- * @param buffer_size Size of the given buffer.
+ * @param algorithm Lowercase algorithm name (md5, sha256, sha512, blowfish etc.)
  *
- * @return Error code (0 on success).
+ * @return Hash algorithm.
  */
-int um_shadow_password_alg_to_id(const char *algorithm, char *id_buffer, size_t buffer_size);
+um_hash_algorithm_t um_shadow_password_algorithm_to_id(const char *algorithm)
+{
+    um_hash_algorithm_t id = um_hash_algorithm_unknown;
+
+    struct
+    {
+        const char *algorithm;
+        um_hash_algorithm_t id;
+    } id_pairs[] = {
+        {
+            .algorithm = "unknown",
+            .id = um_hash_algorithm_unknown,
+        },
+        {
+            .algorithm = "md5",
+            .id = um_hash_algorithm_md5,
+        },
+        {
+            .algorithm = "blowfish",
+            .id = um_hash_algorithm_blowfish,
+        },
+        {
+            .algorithm = "bcrypt",
+            .id = um_hash_algorithm_bcrypt,
+        },
+        {
+            .algorithm = "sha256",
+            .id = um_hash_algorithm_sha256,
+        },
+        {
+            .algorithm = "sha512",
+            .id = um_hash_algorithm_sha512,
+        },
+    };
+
+    for (size_t i = 0; i < sizeof(id_pairs) / sizeof(id_pairs[0]); i++)
+    {
+        if (!strcmp(id_pairs[i].algorithm, algorithm))
+        {
+            id = id_pairs[i].id;
+            break;
+        }
+    }
+
+    return id;
+}
+
+/**
+ * Convert the um_hash_algorithm_t enum to string.
+ *
+ * @param id Algorithm id.
+ *
+ * @return Algorithm id value (for example, $1$ is the id for md5. um_hash_algorithm_md5 will be converted to "1").
+ */
+const char *um_shadow_password_algorithm_id2str(um_hash_algorithm_t id)
+{
+    const char *id_str = NULL;
+
+    struct
+    {
+        um_hash_algorithm_t id;
+        const char *id_str;
+    } id_pairs[] = {
+        {
+            .id = um_hash_algorithm_unknown,
+            .id_str = NULL,
+        },
+        {
+            .id = um_hash_algorithm_md5,
+            .id_str = "1",
+        },
+        {
+            .id = um_hash_algorithm_blowfish,
+            .id_str = "2a",
+        },
+        {
+            .id = um_hash_algorithm_bcrypt,
+            .id_str = "2b",
+        },
+        {
+            .id = um_hash_algorithm_sha256,
+            .id_str = "5",
+        },
+        {
+            .id = um_hash_algorithm_sha512,
+            .id_str = "6",
+        },
+    };
+
+    for (size_t i = 0; i < sizeof(id_pairs) / sizeof(id_pairs[0]); i++)
+    {
+        if (id_pairs[i].id == id)
+        {
+            id_str = id_pairs[i].id_str;
+            break;
+        }
+    }
+
+    return id_str;
+}
 
 /**
  * Set the algorithm ID of the given shadow password.

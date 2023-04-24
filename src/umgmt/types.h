@@ -105,4 +105,19 @@ struct um_shadow_password_s
     byte_t *hash;    ///< Hash of the password.
 };
 
+/**
+ * Common hash algorithms used in shadow files.
+ */
+enum um_hash_algorithm_e
+{
+    um_hash_algorithm_unknown = 0, ///< Unknown algorithm.
+    um_hash_algorithm_md5,         ///< md5 algorithm.
+    um_hash_algorithm_blowfish,    ///< blowfish algorithm.
+    um_hash_algorithm_bcrypt,      ///< bcrypt algorithm.
+    um_hash_algorithm_sha256,      ///< sha256 algorithm.
+    um_hash_algorithm_sha512,      ///< sha512 algorithm.
+};
+
+typedef enum um_hash_algorithm_e um_hash_algorithm_t;
+
 #endif // UMGMT_TYPES_H

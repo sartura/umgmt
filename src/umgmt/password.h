@@ -18,12 +18,12 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#define SHADOW_PASSWORD_ALG_MD5 "1"        ///< md5 algorithm identifier.
-#define SHADOW_PASSWORD_ALG_BLOWFISH "2a"  ///< blowfish algorithm identifier.
-#define SHADOW_PASSWORD_ALG_BLOWFISH2 "2y" ///< Second blowfish algorithm identifier.
-#define SHADOW_PASSWORD_ALG_BCRYPT "2b"    ///< bcrypt algorithm identifier.
-#define SHADOW_PASSWORD_ALG_SHA256 "5"     ///< sha256 algorithm identifier.
-#define SHADOW_PASSWORD_ALG_SHA512 "6"     ///< sha512 algorigthm identifier.
+#define UM_SHADOW_PASSWORD_ALG_MD5 "1"        ///< md5 algorithm identifier.
+#define UM_SHADOW_PASSWORD_ALG_BLOWFISH "2a"  ///< blowfish algorithm identifier.
+#define UM_SHADOW_PASSWORD_ALG_BLOWFISH2 "2y" ///< Second blowfish algorithm identifier.
+#define UM_SHADOW_PASSWORD_ALG_BCRYPT "2b"    ///< bcrypt algorithm identifier.
+#define UM_SHADOW_PASSWORD_ALG_SHA256 "5"     ///< sha256 algorithm identifier.
+#define UM_SHADOW_PASSWORD_ALG_SHA512 "6"     ///< sha512 algorigthm identifier.
 
 /**
  * Create a new shadow password data structure.
@@ -56,15 +56,22 @@ int um_shadow_password_from_plaintext(const char *password, const char *algorith
                                       um_shadow_password_t *shp);
 
 /**
- * Convert the algorithm name to the id which will be written to the shadow data.
+ * Convert the algorithm name to the um_hash_algorithm_t enum value.
  *
- * @param algorithm Algorithm name (md5, sha256, sha512, blowfish etc.) All lowercase.
- * @param id_buffer Buffer to write the id to.
- * @param buffer_size Size of the given buffer.
+ * @param algorithm Lowercase algorithm name (md5, sha256, sha512, blowfish etc.)
  *
- * @return Error code (0 on success).
+ * @return Hash algorithm.
  */
-int um_shadow_password_alg_to_id(const char *algorithm, char *id_buffer, size_t buffer_size);
+um_hash_algorithm_t um_shadow_password_algorithm_to_id(const char *algorithm);
+
+/**
+ * Convert the um_hash_algorithm_t enum to string.
+ *
+ * @param id Algorithm id.
+ *
+ * @return Algorithm id value (for example, $1$ is the id for md5. um_hash_algorithm_md5 will be converted to "1").
+ */
+const char *um_shadow_password_algorithm_id2str(um_hash_algorithm_t id);
 
 /**
  * Set the algorithm ID of the given shadow password.
