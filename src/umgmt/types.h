@@ -14,6 +14,16 @@
 #define UMGMT_TYPES_H
 
 /**
+ * Byte type alias.
+ */
+typedef unsigned char byte_t;
+
+/**
+ * Boolean type alias.
+ */
+typedef unsigned char bool_t;
+
+/**
  * Abstract user type - containing information from /etc/passwd and /etc/shadow.
  */
 typedef struct um_user_s um_user_t;
@@ -90,9 +100,9 @@ struct um_group_user_element_s
  */
 struct um_shadow_password_s
 {
-    const char *algorithm; ///< Algorithm used for hashing the password.
-    const char *salt;      ///< Salt used for the hash.
-    const char *hash;      ///< Hash of the password.
+    char *algorithm; ///< Algorithm used for hashing the password.
+    byte_t *salt;    ///< Salt used for the hash.
+    byte_t *hash;    ///< Hash of the password.
 };
 
 #endif // UMGMT_TYPES_H
