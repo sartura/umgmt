@@ -24,6 +24,11 @@ typedef struct um_user_s um_user_t;
 typedef struct um_group_s um_group_t;
 
 /**
+ * Shadow password data type.
+ */
+typedef struct um_shadow_password_s um_shadow_password_t;
+
+/**
  * Group list element.
  */
 typedef struct um_group_element_s um_group_element_t;
