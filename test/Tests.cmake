@@ -22,6 +22,30 @@ target_link_libraries(
 target_link_options(test_user PRIVATE ${USER_UTEST_LINKER_OPTIONS})
 add_test(NAME test_user COMMAND test_user)
 
+# test dyn buffer data type
+set(
+    USER_UTEST_LINKER_OPTIONS
+    "-Wl,--wrap=strdup"
+    "-Wl,--wrap=malloc"
+)
+add_executable(
+    test_dyn_buffer
+
+    test/test_dyn_buffer.c
+    test/common.c
+)
+
+target_link_libraries(
+    test_dyn_buffer
+
+    ${CMOCKA_LIBRARIES}
+    ${SYSREPO_LIBRARIES}
+    ${LIBYANG_LIBRARIES}
+    ${CMAKE_PROJECT_NAME}
+)
+target_link_options(test_dyn_buffer PRIVATE ${USER_UTEST_LINKER_OPTIONS})
+add_test(NAME test_dyn_buffer COMMAND test_dyn_buffer)
+
 # test group data type
 set(
     GROUP_UTEST_LINKER_OPTIONS
