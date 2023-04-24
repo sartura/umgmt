@@ -26,6 +26,25 @@ um_dyn_byte_buffer_t um_dyn_byte_buffer_new(void)
 }
 
 /**
+ * Allocate space for the dynamic buffer.
+ *
+ * @param buff Buffer to allocate.
+ * @param size Size of the data to allocate.
+ */
+int um_dyn_byte_buffer_alloc(um_dyn_byte_buffer_t *buff, size_t size)
+{
+    buff->buffer = (byte_t *)malloc(sizeof(byte_t) * size);
+    if (!buff->buffer)
+    {
+        return -1;
+    }
+
+    buff->size = size;
+
+    return 0;
+}
+
+/**
  * Copy the given buffer into the destination.
  *
  * @param src Source buffer.

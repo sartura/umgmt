@@ -18,6 +18,62 @@
 #include <stdio.h>
 #include <assert.h>
 
+#include <openssl/sha.h>
+#include <openssl/rand.h>
+
+static int hash_with_sha256(const char *password, bool_t use_salt, um_shadow_password_t *shp)
+{
+    int error = 0;
+
+    // full data buffer
+    um_dyn_byte_buffer_t data_buffer = um_dyn_byte_buffer_new();
+
+    // calculate sizes
+    const size_t salt_len = 16;
+    const size_t password_len = strlen(password);
+    const size_t full_size = salt_len + password_len;
+    size_t curr_ptr = 0;
+
+    // allocate full size data
+    error = um_dyn_byte_buffer_alloc(&data_buffer, full_size);
+    if (error)
+    {
+        return -1;
+    }
+
+    // append salt to the start of the data
+    if (use_salt)
+    {
+        um_dyn_byte_buffer_alloc(&shp->salt, salt_len);
+
+        error = RAND_bytes(shp->salt.buffer, (int)salt_len);
+        if (!error)
+        {
+            return -2;
+        }
+
+        // copy the salt at the start of the data
+        memcpy(shp->salt.buffer, data_buffer.buffer, salt_len);
+        curr_ptr += salt_len;
+    }
+
+    // copy the plaintext data after the salt
+    memcpy((void *)password, &data_buffer.buffer[curr_ptr], password_len);
+
+    // now hash the data and store it to the shp hash buffer
+    // allocate the hash buffer:
+    error = um_dyn_byte_buffer_alloc(&shp->hash, SHA256_DIGEST_LENGTH);
+    if (error)
+    {
+        return -3;
+    }
+
+    // calculate sha256 hash:
+    SHA256(data_buffer.buffer, data_buffer.size, shp->hash.buffer);
+
+    return error;
+}
+
 /**
  * Create a new shadow password data structure.
  *
@@ -117,7 +173,57 @@ out:
  * @return Error code(0 on success).
  */
 int um_shadow_password_from_plaintext(const char *password, const char *algorithm, bool_t use_salt,
-                                      um_shadow_password_t *shp);
+                                      um_shadow_password_t *shp)
+{
+    int error = 0;
+
+    // store temporary data before applying changes to the output
+    um_shadow_password_t temp = um_shadow_password_new();
+
+    // get the algorithm id
+    um_hash_algorithm_t alg_id = um_shadow_password_algorithm_to_id(algorithm);
+
+    // hash the plaintext password depending on the algorithm
+    switch (alg_id)
+    {
+    case um_hash_algorithm_unknown:
+        // [TODO]: return an error
+        break;
+    case um_hash_algorithm_sha256:
+        error = hash_with_sha256(password, use_salt, &temp);
+        if (error)
+        {
+            goto error_out;
+        }
+        break;
+    }
+
+    // copy the temp value to the output
+    shp->algorithm = strdup(um_shadow_password_algorithm_id2str(alg_id));
+
+    error = um_shadow_password_set_salt(shp, temp.salt.buffer, temp.salt.size);
+    if (error)
+    {
+        goto error_out;
+    }
+
+    error = um_shadow_password_set_hash(shp, temp.hash.buffer, temp.hash.size);
+    if (error)
+    {
+        goto error_out;
+    }
+
+    goto out;
+
+error_out:
+	error = -1;
+
+out:
+    // release the temporary value
+    um_shadow_password_free(&temp);
+
+    return error;
+}
 
 /**
  * Convert the algorithm name to the um_hash_algorithm_t enum value.

@@ -13,6 +13,9 @@ include_directories(
     ${PROJECT_SOURCE_DIR}/deps/uthash/include
 )
 
+# find OpenSSL for hashing functionality
+find_package(OpenSSL REQUIRED)
+
 set(
     UMGMT_SOURCES
 
@@ -27,6 +30,12 @@ add_library(
     ${CMAKE_PROJECT_NAME}
     SHARED
     ${UMGMT_SOURCES}
+)
+
+target_link_libraries(
+	${CMAKE_PROJECT_NAME}
+
+	OpenSSL::Crypto
 )
 
 install(
@@ -53,6 +62,8 @@ install(
     ${PROJECT_SOURCE_DIR}/src/umgmt/db.h
     ${PROJECT_SOURCE_DIR}/src/umgmt/user.h
     ${PROJECT_SOURCE_DIR}/src/umgmt/group.h
+    ${PROJECT_SOURCE_DIR}/src/umgmt/password.h
+    ${PROJECT_SOURCE_DIR}/src/umgmt/dyn_buffer.h
 
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/umgmt
 )
