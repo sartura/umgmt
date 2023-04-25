@@ -15,8 +15,6 @@ target_link_libraries(
     test_user
 
     ${CMOCKA_LIBRARIES}
-    ${SYSREPO_LIBRARIES}
-    ${LIBYANG_LIBRARIES}
     ${CMAKE_PROJECT_NAME}
 )
 target_link_options(test_user PRIVATE ${USER_UTEST_LINKER_OPTIONS})
@@ -24,7 +22,7 @@ add_test(NAME test_user COMMAND test_user)
 
 # test dyn buffer data type
 set(
-    USER_UTEST_LINKER_OPTIONS
+    DYN_BUFFER_UTEST_LINKER_OPTIONS
     "-Wl,--wrap=strdup"
     "-Wl,--wrap=malloc"
 )
@@ -38,12 +36,10 @@ add_executable(
 target_link_libraries(
     test_dyn_buffer
 
-    ${CMOCKA_LIBRARIES}
-    ${SYSREPO_LIBRARIES}
-    ${LIBYANG_LIBRARIES}
-    ${CMAKE_PROJECT_NAME}
+    PRIVATE ${CMOCKA_LIBRARIES}
+    PRIVATE umgmt
 )
-target_link_options(test_dyn_buffer PRIVATE ${USER_UTEST_LINKER_OPTIONS})
+target_link_options(test_dyn_buffer PRIVATE ${DYN_BUFFER_UTEST_LINKER_OPTIONS})
 add_test(NAME test_dyn_buffer COMMAND test_dyn_buffer)
 
 # test group data type
@@ -64,8 +60,6 @@ target_link_libraries(
     test_group
 
     ${CMOCKA_LIBRARIES}
-    ${SYSREPO_LIBRARIES}
-    ${LIBYANG_LIBRARIES}
     ${CMAKE_PROJECT_NAME}
 )
 target_link_options(test_group PRIVATE ${GROUP_UTEST_LINKER_OPTIONS})
@@ -88,8 +82,6 @@ target_link_libraries(
     test_db
 
     ${CMOCKA_LIBRARIES}
-    ${SYSREPO_LIBRARIES}
-    ${LIBYANG_LIBRARIES}
     ${CMAKE_PROJECT_NAME}
 )
 target_link_options(test_db PRIVATE ${GROUP_UTEST_LINKER_OPTIONS})
