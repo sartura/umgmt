@@ -345,8 +345,6 @@ int um_shadow_password_set_algorithm_id(um_shadow_password_t *shp, const char *a
 {
     int error = 0;
 
-    const size_t len = strlen(alg_id);
-
     if (shp->algorithm)
     {
         // [TODO]: decide what to do if this is the case
