@@ -1,3 +1,53 @@
+# test dyn buffer data type
+set(
+    DYN_BUFFER_UTEST_LINKER_OPTIONS
+    "-Wl,--wrap=malloc"
+)
+add_executable(
+    test_dyn_buffer
+
+    test/test_dyn_buffer.c
+    test/common.c
+
+    # tested source files
+    ${CMAKE_SOURCE_DIR}/src/umgmt/dyn_buffer.c
+)
+
+target_link_libraries(
+    test_dyn_buffer
+
+    PRIVATE ${CMOCKA_LIBRARIES}
+    PRIVATE umgmt
+)
+target_link_options(test_dyn_buffer PRIVATE ${DYN_BUFFER_UTEST_LINKER_OPTIONS})
+add_test(NAME test_dyn_buffer COMMAND test_dyn_buffer)
+
+# test shadow password data type
+set(
+    PASSWORD_UTEST_LINKER_OPTIONS
+    "-Wl,--wrap=strdup"
+    "-Wl,--wrap=malloc"
+)
+add_executable(
+    test_password
+
+    test/test_password.c
+    test/common.c
+
+    # tested source files
+    ${CMAKE_SOURCE_DIR}/src/umgmt/dyn_buffer.c
+    ${CMAKE_SOURCE_DIR}/src/umgmt/password.c
+)
+
+target_link_libraries(
+    test_password
+
+    PRIVATE ${CMOCKA_LIBRARIES}
+    PRIVATE OpenSSL::Crypto
+)
+target_link_options(test_password PRIVATE ${PASSWORD_UTEST_LINKER_OPTIONS})
+add_test(NAME test_password COMMAND test_password)
+
 # test user data type
 set(
     USER_UTEST_LINKER_OPTIONS
@@ -19,31 +69,6 @@ target_link_libraries(
 )
 target_link_options(test_user PRIVATE ${USER_UTEST_LINKER_OPTIONS})
 add_test(NAME test_user COMMAND test_user)
-
-# test dyn buffer data type
-set(
-    DYN_BUFFER_UTEST_LINKER_OPTIONS
-    "-Wl,--wrap=strdup"
-    "-Wl,--wrap=malloc"
-)
-add_executable(
-    test_dyn_buffer
-
-    test/test_dyn_buffer.c
-    test/common.c
-
-    # tested source files
-    ${CMAKE_SOURCE_DIR}/src/umgmt/dyn_buffer.c
-)
-
-target_link_libraries(
-    test_dyn_buffer
-
-    PRIVATE ${CMOCKA_LIBRARIES}
-    PRIVATE umgmt
-)
-target_link_options(test_dyn_buffer PRIVATE ${DYN_BUFFER_UTEST_LINKER_OPTIONS})
-add_test(NAME test_dyn_buffer COMMAND test_dyn_buffer)
 
 # test group data type
 set(
