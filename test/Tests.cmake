@@ -31,6 +31,9 @@ add_executable(
 
     test/test_dyn_buffer.c
     test/common.c
+
+    # tested source files
+    ${CMAKE_SOURCE_DIR}/src/umgmt/dyn_buffer.c
 )
 
 target_link_libraries(
