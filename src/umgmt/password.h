@@ -18,13 +18,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#define UM_SHADOW_PASSWORD_ALG_MD5 "1"        ///< md5 algorithm identifier.
-#define UM_SHADOW_PASSWORD_ALG_BLOWFISH "2a"  ///< blowfish algorithm identifier.
-#define UM_SHADOW_PASSWORD_ALG_BLOWFISH2 "2y" ///< Second blowfish algorithm identifier.
-#define UM_SHADOW_PASSWORD_ALG_BCRYPT "2b"    ///< bcrypt algorithm identifier.
-#define UM_SHADOW_PASSWORD_ALG_SHA256 "5"     ///< sha256 algorithm identifier.
-#define UM_SHADOW_PASSWORD_ALG_SHA512 "6"     ///< sha512 algorigthm identifier.
-
 /**
  * Create a new shadow password data structure.
  *
