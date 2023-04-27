@@ -350,10 +350,13 @@ int um_shadow_password_set_algorithm_id(um_shadow_password_t *shp, const char *a
         // [TODO]: decide what to do if this is the case
     }
 
-    shp->algorithm = strdup(alg_id);
-    if (shp->algorithm == NULL)
+    if (alg_id)
     {
-        goto error_out;
+        shp->algorithm = strdup(alg_id);
+        if (!shp->algorithm)
+        {
+            goto error_out;
+        }
     }
 
     // successful end

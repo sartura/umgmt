@@ -52,11 +52,39 @@ static void test_shadow_password_new_correct(void **state)
 static void test_shadow_password_set_algorithm_correct(void **state)
 {
     (void)state;
+
+    const char *alg_id = "sha512";
+    int error = 0;
+
+    um_shadow_password_t shp = um_shadow_password_new();
+
+    // setup strdup wrapper
+    expect_string(__wrap_strdup, s, alg_id);
+    will_return(__wrap_strdup, alg_id);
+
+    error = um_shadow_password_set_algorithm_id(&shp, alg_id);
+
+    assert_int_equal(error, 0);
+    assert_string_equal(shp.algorithm, alg_id);
 }
 
 static void test_shadow_password_set_algorithm_incorrect(void **state)
 {
     (void)state;
+
+    const char *alg_id = "sha256";
+    int error = 0;
+
+    um_shadow_password_t shp = um_shadow_password_new();
+
+    // setup strdup wrapper
+    expect_string(__wrap_strdup, s, alg_id);
+    will_return(__wrap_strdup, NULL);
+
+    error = um_shadow_password_set_algorithm_id(&shp, alg_id);
+
+    assert_int_equal(error, -1);
+    assert_ptr_equal(shp.algorithm, NULL);
 }
 
 static void test_shadow_password_set_salt_correct(void **state)

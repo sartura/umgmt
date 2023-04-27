@@ -1,5 +1,5 @@
-#ifndef UMTM_COMMON_UTEST_H
-#define UMTM_COMMON_UTEST_H
+#ifndef UMGMT_COMMON_UTEST_H
+#define UMGMT_COMMON_UTEST_H
 
 #include <stdarg.h>
 #include <stddef.h>
@@ -14,4 +14,4 @@ extern void *__real_malloc(size_t size);
 char *__wrap_strdup(const char *s);
 extern char *__real_strdup(const char *s);
 
-#endif // UMTM_COMMON_UTEST_H
+#endif // UMGMT_COMMON_UTEST_H
