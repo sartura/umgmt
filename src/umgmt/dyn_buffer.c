@@ -64,7 +64,7 @@ int um_dyn_byte_buffer_copy(um_dyn_byte_buffer_t *src, um_dyn_byte_buffer_t *dst
     const size_t n = dst->size = src->size;
 
     // copy the buffer into the destination
-    memcpy(src->buffer, dst->buffer, n);
+    memcpy(dst->buffer, src->buffer, n);
 
     return 0;
 }
