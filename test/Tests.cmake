@@ -27,6 +27,7 @@ set(
     PASSWORD_UTEST_LINKER_OPTIONS
     "-Wl,--wrap=strdup"
     "-Wl,--wrap=malloc"
+    "-Wl,--wrap=um_dyn_byte_buffer_copy"
 )
 add_executable(
     test_password
