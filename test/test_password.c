@@ -20,6 +20,10 @@ static void test_shadow_password_set_algorithm_incorrect(void **state);
 static void test_shadow_password_set_salt_correct(void **state);
 static void test_shadow_password_set_salt_incorrect(void **state);
 
+// test converters
+static void test_shadow_password_algorithm_to_id(void **state);
+static void test_shadow_password_algorithm_id2str(void **state);
+
 // test set hash
 static void test_shadow_password_set_hash_correct(void **state);
 static void test_shadow_password_set_hash_incorrect(void **state);
@@ -37,6 +41,8 @@ int main(void)
         cmocka_unit_test(test_shadow_password_set_salt_incorrect),
         cmocka_unit_test(test_shadow_password_set_hash_correct),
         cmocka_unit_test(test_shadow_password_set_hash_incorrect),
+        cmocka_unit_test(test_shadow_password_algorithm_to_id),
+        cmocka_unit_test(test_shadow_password_algorithm_id2str),
     };
     return cmocka_run_group_tests(tests, NULL, NULL);
 }
@@ -168,6 +174,70 @@ static void test_shadow_password_set_hash_incorrect(void **state)
 
     // assert valid functionality
     assert_int_equal(error, -1);
+}
+
+static void test_shadow_password_algorithm_to_id(void **state)
+{
+    (void)state;
+
+    char *alg_name = "";
+    um_hash_algorithm_t alg_id = um_hash_algorithm_unknown;
+
+    alg_name = "md5";
+    alg_id = um_shadow_password_algorithm_to_id(alg_name);
+    assert_int_equal(alg_id, um_hash_algorithm_md5);
+
+    alg_name = "blowfish";
+    alg_id = um_shadow_password_algorithm_to_id(alg_name);
+    assert_int_equal(alg_id, um_hash_algorithm_blowfish);
+
+    alg_name = "bcrypt";
+    alg_id = um_shadow_password_algorithm_to_id(alg_name);
+    assert_int_equal(alg_id, um_hash_algorithm_bcrypt);
+
+    alg_name = "sha256";
+    alg_id = um_shadow_password_algorithm_to_id(alg_name);
+    assert_int_equal(alg_id, um_hash_algorithm_sha256);
+
+    alg_name = "sha512";
+    alg_id = um_shadow_password_algorithm_to_id(alg_name);
+    assert_int_equal(alg_id, um_hash_algorithm_sha512);
+
+    alg_name = "random";
+    alg_id = um_shadow_password_algorithm_to_id(alg_name);
+    assert_int_equal(alg_id, um_hash_algorithm_unknown);
+}
+
+static void test_shadow_password_algorithm_id2str(void **state)
+{
+    (void)state;
+
+    um_hash_algorithm_t alg_id = um_hash_algorithm_unknown;
+    const char *alg_name = NULL;
+
+    alg_id = um_hash_algorithm_md5;
+    alg_name = um_shadow_password_algorithm_id2str(alg_id);
+    assert_string_equal(alg_name, "1");
+
+    alg_id = um_hash_algorithm_blowfish;
+    alg_name = um_shadow_password_algorithm_id2str(alg_id);
+    assert_string_equal(alg_name, "2a");
+
+    alg_id = um_hash_algorithm_bcrypt;
+    alg_name = um_shadow_password_algorithm_id2str(alg_id);
+    assert_string_equal(alg_name, "2b");
+
+    alg_id = um_hash_algorithm_sha256;
+    alg_name = um_shadow_password_algorithm_id2str(alg_id);
+    assert_string_equal(alg_name, "5");
+
+    alg_id = um_hash_algorithm_sha512;
+    alg_name = um_shadow_password_algorithm_id2str(alg_id);
+    assert_string_equal(alg_name, "6");
+
+    alg_id = um_hash_algorithm_unknown;
+    alg_name = um_shadow_password_algorithm_id2str(alg_id);
+    assert_ptr_equal(alg_name, NULL);
 }
 
 int __wrap_um_dyn_byte_buffer_copy(um_dyn_byte_buffer_t *src, um_dyn_byte_buffer_t *dst)
