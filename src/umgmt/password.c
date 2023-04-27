@@ -216,7 +216,7 @@ int um_shadow_password_from_plaintext(const char *password, const char *algorith
     goto out;
 
 error_out:
-	error = -1;
+    error = -1;
 
 out:
     // release the temporary value
@@ -352,13 +352,11 @@ int um_shadow_password_set_algorithm_id(um_shadow_password_t *shp, const char *a
         // [TODO]: decide what to do if this is the case
     }
 
-    shp->algorithm = (char *)malloc(sizeof(char) * len);
+    shp->algorithm = strdup(alg_id);
     if (shp->algorithm == NULL)
     {
         goto error_out;
     }
-
-    memcpy(shp->algorithm, alg_id, len);
 
     // successful end
     goto out;
