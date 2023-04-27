@@ -133,11 +133,41 @@ static void test_shadow_password_set_salt_incorrect(void **state)
 static void test_shadow_password_set_hash_correct(void **state)
 {
     (void)state;
+
+    const char *hash = "b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9";
+    int error = 0;
+
+    um_shadow_password_t shp = um_shadow_password_new();
+
+    // setup buffer copy wrapper
+    expect_value(__wrap_um_dyn_byte_buffer_copy, dst, &shp.hash);
+    will_return(__wrap_um_dyn_byte_buffer_copy, 0);
+
+    // call function
+    error = um_shadow_password_set_hash(&shp, (byte_t *)hash, strlen(hash));
+
+    // assert valid functionality
+    assert_int_equal(error, 0);
 }
 
 static void test_shadow_password_set_hash_incorrect(void **state)
 {
     (void)state;
+
+    const char *hash = "b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9";
+    int error = 0;
+
+    um_shadow_password_t shp = um_shadow_password_new();
+
+    // setup buffer copy wrapper
+    expect_value(__wrap_um_dyn_byte_buffer_copy, dst, &shp.hash);
+    will_return(__wrap_um_dyn_byte_buffer_copy, -1);
+
+    // call function
+    error = um_shadow_password_set_hash(&shp, (byte_t *)hash, strlen(hash));
+
+    // assert valid functionality
+    assert_int_equal(error, -1);
 }
 
 int __wrap_um_dyn_byte_buffer_copy(um_dyn_byte_buffer_t *src, um_dyn_byte_buffer_t *dst)
